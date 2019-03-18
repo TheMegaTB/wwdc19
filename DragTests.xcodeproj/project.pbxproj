@@ -15,6 +15,8 @@
 		302EAD0F223BBA0E004DBCFC /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 302EAD0D223BBA0E004DBCFC /* Main.storyboard */; };
 		302EAD11223BBA13004DBCFC /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 302EAD10223BBA13004DBCFC /* Assets.xcassets */; };
 		302EAD14223BBA13004DBCFC /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 302EAD12223BBA13004DBCFC /* LaunchScreen.storyboard */; };
+		30672093223F13E600F825AC /* OrbitingNode.swift in Sources */ = {isa = PBXBuildFile; fileRef = 30672092223F13E600F825AC /* OrbitingNode.swift */; };
+		30C58EEB223E5CFC00FCF388 /* OrbitalDynamics.swift in Sources */ = {isa = PBXBuildFile; fileRef = 30C58EEA223E5CFC00FCF388 /* OrbitalDynamics.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -28,6 +30,8 @@
 		302EAD10223BBA13004DBCFC /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		302EAD13223BBA13004DBCFC /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		302EAD15223BBA13004DBCFC /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		30672092223F13E600F825AC /* OrbitingNode.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OrbitingNode.swift; sourceTree = "<group>"; };
+		30C58EEA223E5CFC00FCF388 /* OrbitalDynamics.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OrbitalDynamics.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -69,6 +73,8 @@
 				302EAD10223BBA13004DBCFC /* Assets.xcassets */,
 				302EAD12223BBA13004DBCFC /* LaunchScreen.storyboard */,
 				302EAD15223BBA13004DBCFC /* Info.plist */,
+				30C58EEA223E5CFC00FCF388 /* OrbitalDynamics.swift */,
+				30672092223F13E600F825AC /* OrbitingNode.swift */,
 			);
 			path = DragTests;
 			sourceTree = "<group>";
@@ -147,8 +153,10 @@
 			buildActionMask = 2147483647;
 			files = (
 				302EAD0A223BBA0E004DBCFC /* GameScene.swift in Sources */,
+				30C58EEB223E5CFC00FCF388 /* OrbitalDynamics.swift in Sources */,
 				302EAD0C223BBA0E004DBCFC /* GameViewController.swift in Sources */,
 				302EAD04223BBA0E004DBCFC /* AppDelegate.swift in Sources */,
+				30672093223F13E600F825AC /* OrbitingNode.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
