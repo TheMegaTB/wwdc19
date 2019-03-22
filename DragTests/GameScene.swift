@@ -267,8 +267,7 @@ class GameScene: SKScene {
             let defaultVector = Vector(planet.position) + Vector(0, 1, 0)
             let currentVector = Vector(camera.position) - Vector(planet.position)
             let angle = atan2(currentVector.y - defaultVector.y, currentVector.x - defaultVector.x)
-            camera.zRotation = angle
-            print(angle)
+            camera.zRotation = angle - CGFloat.pi / 2
 
             // TODO Orient the camera towards the planet to prevent confusion
             camera.position = orbitingEntities[0].position
