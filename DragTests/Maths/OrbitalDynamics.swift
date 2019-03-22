@@ -63,6 +63,9 @@ struct Vector: Equatable, ExpressibleByArrayLiteral, CustomStringConvertible {
         return sqrt(x*x + y*y + z*z)
     }
 
+    var cgVector: CGVector { return CGVector(dx: self.x, dy: self.y) }
+    var cgPoint: CGPoint { return CGPoint(x: self.x, y: self.y) }
+
     func normalized() -> Vector {
         let length = self.length
         return Vector(x / length, y / length, z / length)
@@ -124,6 +127,12 @@ struct Vector: Equatable, ExpressibleByArrayLiteral, CustomStringConvertible {
     }
 }
 
+enum OrbitError: Error {
+    case hyperbolicOrbit
+}
+
+typealias CartesianState = (position: Vector, velocity: Vector)
+
 struct OrbitalParameters {
     let semiMajorAxis: Double               // a [m]
     let eccentricity: Double                // e [1]
@@ -132,26 +141,30 @@ struct OrbitalParameters {
     let inclination: Double                 // i [rad]
     let meanAnomaly: Double                 // M [rad]
 
-    let standardGravitationalParameter: Double
+    let standardGravitationalParameter: Double  // μ
 
-    //    var timeSincePeriapsis: TimeInterval {
-    //        return timeEquation(eccentricAnomaly: self.eccentricAnomaly)
-    //    }
-    //
-    //    var timeToNextPeriapsis: TimeInterval {
-    //        return orbitalPeriod - timeSincePeriapsis
-    //    }
-    //
-    //    var radius: Double {
-    //        return (semiMajorAxis * (1 - pow(eccentricity, 2))) / (1 + eccentricity * cos(trueAnomaly))
-    //    }
+    var apoapsis: CartesianState {
+        return cartesianState(atAnomaly: Double.pi)
+    }
 
-    var apoapsis: Double {
+    var periapsis: CartesianState {
+        return cartesianState(atAnomaly: 0)
+    }
+
+    var apoapsisHeight: Double {
         return semiMajorAxis * (1 + eccentricity)
     }
 
-    var periapsis: Double {
+    var periapsisHeight: Double {
         return semiMajorAxis * (1 - eccentricity)
+    }
+
+    var orbitalPeriod: TimeInterval {
+        return 2 * Double.pi * sqrt(pow(semiMajorAxis, 3) / standardGravitationalParameter)
+    }
+
+    var isHyperbolic: Bool {
+        return eccentricity > 1
     }
 
     init(positionVector r: Vector, velocityVector ṙ: Vector, gravitationalConstant μ: Double) {
@@ -220,11 +233,11 @@ struct OrbitalParameters {
         self.standardGravitationalParameter = μ
     }
 
-    var orbitalPeriod: TimeInterval {
-        return 2 * Double.pi * sqrt(pow(semiMajorAxis, 3) / standardGravitationalParameter)
-    }
+    func eccentricAnomaly(after interval: TimeInterval) throws -> Double {
+        if isHyperbolic {
+            throw OrbitError.hyperbolicOrbit
+        }
 
-    func eccentricAnomaly(after interval: TimeInterval) -> Double {
         // Few redeclarations for readability
         let μ = standardGravitationalParameter
         let e = eccentricity
@@ -249,7 +262,7 @@ struct OrbitalParameters {
         return E
     }
 
-    func cartesianState(atAnomaly eccentricAnomaly: Double) -> (position: Vector, velocity: Vector) {
+    func cartesianState(atAnomaly eccentricAnomaly: Double) -> CartesianState {
         // Few redeclarations for readability
         let a = semiMajorAxis
         let e = eccentricity
@@ -292,12 +305,12 @@ struct OrbitalParameters {
         return (position: r, velocity: ṙ)
     }
 
-    func cartesianState(after interval: TimeInterval) -> (position: Vector, velocity: Vector) {
-        return cartesianState(atAnomaly: eccentricAnomaly(after: interval))
+    func cartesianState(after interval: TimeInterval) throws -> CartesianState {
+        return cartesianState(atAnomaly: try eccentricAnomaly(after: interval))
     }
 
-    func orbitPath() -> CGPath {
-        let stepSize = 0.01
+    func orbitPath() -> [CGPoint] {
+        let stepSize = 0.001
         var eccentricAnomaly = 0.0
         var points: [CGPoint] = []
 
@@ -308,8 +321,14 @@ struct OrbitalParameters {
             eccentricAnomaly += stepSize
         }
 
+        return points
+    }
+
+    func orbitPath(atScale scale: CGFloat, translation: CGVector) -> CGPath {
         let path = CGMutablePath()
+        let points = orbitPath().map { CGPoint(x: $0.x * scale + translation.dx, y: $0.y * scale + translation.dy) }
         path.addLines(between: points)
+        path.closeSubpath()
 
         return path
     }

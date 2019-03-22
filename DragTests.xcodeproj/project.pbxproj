@@ -15,8 +15,14 @@
 		302EAD0F223BBA0E004DBCFC /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 302EAD0D223BBA0E004DBCFC /* Main.storyboard */; };
 		302EAD11223BBA13004DBCFC /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 302EAD10223BBA13004DBCFC /* Assets.xcassets */; };
 		302EAD14223BBA13004DBCFC /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 302EAD12223BBA13004DBCFC /* LaunchScreen.storyboard */; };
+		30582E3D22440D3100BE56D3 /* ButtonNode.swift in Sources */ = {isa = PBXBuildFile; fileRef = 30582E3C22440D3100BE56D3 /* ButtonNode.swift */; };
+		30582E402244D38200BE56D3 /* CGPoint+IsWithin.swift in Sources */ = {isa = PBXBuildFile; fileRef = 30582E3F2244D38200BE56D3 /* CGPoint+IsWithin.swift */; };
 		30672093223F13E600F825AC /* OrbitingNode.swift in Sources */ = {isa = PBXBuildFile; fileRef = 30672092223F13E600F825AC /* OrbitingNode.swift */; };
+		306720952240498500F825AC /* OrbitMarker.swift in Sources */ = {isa = PBXBuildFile; fileRef = 306720942240498500F825AC /* OrbitMarker.swift */; };
+		3067209722405B7F00F825AC /* PlanetNode.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3067209622405B7F00F825AC /* PlanetNode.swift */; };
+		3067209922406C3100F825AC /* SwitchNode.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3067209822406C3100F825AC /* SwitchNode.swift */; };
 		30C58EEB223E5CFC00FCF388 /* OrbitalDynamics.swift in Sources */ = {isa = PBXBuildFile; fileRef = 30C58EEA223E5CFC00FCF388 /* OrbitalDynamics.swift */; };
+		30E94ADE2242E35D005AC4F1 /* CircleIntersection.swift in Sources */ = {isa = PBXBuildFile; fileRef = 30E94ADD2242E35D005AC4F1 /* CircleIntersection.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -30,8 +36,15 @@
 		302EAD10223BBA13004DBCFC /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		302EAD13223BBA13004DBCFC /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		302EAD15223BBA13004DBCFC /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		30582E3C22440D3100BE56D3 /* ButtonNode.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ButtonNode.swift; sourceTree = "<group>"; };
+		30582E3F2244D38200BE56D3 /* CGPoint+IsWithin.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "CGPoint+IsWithin.swift"; sourceTree = "<group>"; };
 		30672092223F13E600F825AC /* OrbitingNode.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OrbitingNode.swift; sourceTree = "<group>"; };
+		306720942240498500F825AC /* OrbitMarker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OrbitMarker.swift; sourceTree = "<group>"; };
+		3067209622405B7F00F825AC /* PlanetNode.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlanetNode.swift; sourceTree = "<group>"; };
+		3067209822406C3100F825AC /* SwitchNode.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SwitchNode.swift; sourceTree = "<group>"; };
 		30C58EEA223E5CFC00FCF388 /* OrbitalDynamics.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OrbitalDynamics.swift; sourceTree = "<group>"; };
+		30E94ADC2242D3CB005AC4F1 /* Circle.playground */ = {isa = PBXFileReference; lastKnownFileType = file.playground; path = Circle.playground; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.swift; };
+		30E94ADD2242E35D005AC4F1 /* CircleIntersection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CircleIntersection.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -48,6 +61,7 @@
 		302EACF7223BBA0E004DBCFC = {
 			isa = PBXGroup;
 			children = (
+				30E94ADC2242D3CB005AC4F1 /* Circle.playground */,
 				302EAD02223BBA0E004DBCFC /* DragTests */,
 				302EAD01223BBA0E004DBCFC /* Products */,
 			);
@@ -64,19 +78,65 @@
 		302EAD02223BBA0E004DBCFC /* DragTests */ = {
 			isa = PBXGroup;
 			children = (
+				30582E442244DAB200BE56D3 /* Support Files */,
 				302EAD03223BBA0E004DBCFC /* AppDelegate.swift */,
-				302EAD05223BBA0E004DBCFC /* GameScene.sks */,
-				302EAD07223BBA0E004DBCFC /* Actions.sks */,
-				302EAD09223BBA0E004DBCFC /* GameScene.swift */,
 				302EAD0B223BBA0E004DBCFC /* GameViewController.swift */,
-				302EAD0D223BBA0E004DBCFC /* Main.storyboard */,
-				302EAD10223BBA13004DBCFC /* Assets.xcassets */,
-				302EAD12223BBA13004DBCFC /* LaunchScreen.storyboard */,
-				302EAD15223BBA13004DBCFC /* Info.plist */,
-				30C58EEA223E5CFC00FCF388 /* OrbitalDynamics.swift */,
-				30672092223F13E600F825AC /* OrbitingNode.swift */,
+				302EAD09223BBA0E004DBCFC /* GameScene.swift */,
+				30582E432244DA6B00BE56D3 /* Maths */,
+				30582E422244DA5300BE56D3 /* UIComponents */,
+				30582E412244DA3000BE56D3 /* OrbitingEntities */,
+				30582E3E2244D36100BE56D3 /* Extensions */,
 			);
 			path = DragTests;
+			sourceTree = "<group>";
+		};
+		30582E3E2244D36100BE56D3 /* Extensions */ = {
+			isa = PBXGroup;
+			children = (
+				30582E3F2244D38200BE56D3 /* CGPoint+IsWithin.swift */,
+			);
+			path = Extensions;
+			sourceTree = "<group>";
+		};
+		30582E412244DA3000BE56D3 /* OrbitingEntities */ = {
+			isa = PBXGroup;
+			children = (
+				30672092223F13E600F825AC /* OrbitingNode.swift */,
+				306720942240498500F825AC /* OrbitMarker.swift */,
+				3067209622405B7F00F825AC /* PlanetNode.swift */,
+			);
+			path = OrbitingEntities;
+			sourceTree = "<group>";
+		};
+		30582E422244DA5300BE56D3 /* UIComponents */ = {
+			isa = PBXGroup;
+			children = (
+				3067209822406C3100F825AC /* SwitchNode.swift */,
+				30582E3C22440D3100BE56D3 /* ButtonNode.swift */,
+			);
+			path = UIComponents;
+			sourceTree = "<group>";
+		};
+		30582E432244DA6B00BE56D3 /* Maths */ = {
+			isa = PBXGroup;
+			children = (
+				30E94ADD2242E35D005AC4F1 /* CircleIntersection.swift */,
+				30C58EEA223E5CFC00FCF388 /* OrbitalDynamics.swift */,
+			);
+			path = Maths;
+			sourceTree = "<group>";
+		};
+		30582E442244DAB200BE56D3 /* Support Files */ = {
+			isa = PBXGroup;
+			children = (
+				302EAD0D223BBA0E004DBCFC /* Main.storyboard */,
+				302EAD12223BBA13004DBCFC /* LaunchScreen.storyboard */,
+				302EAD10223BBA13004DBCFC /* Assets.xcassets */,
+				302EAD15223BBA13004DBCFC /* Info.plist */,
+				302EAD07223BBA0E004DBCFC /* Actions.sks */,
+				302EAD05223BBA0E004DBCFC /* GameScene.sks */,
+			);
+			path = "Support Files";
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -154,9 +214,15 @@
 			files = (
 				302EAD0A223BBA0E004DBCFC /* GameScene.swift in Sources */,
 				30C58EEB223E5CFC00FCF388 /* OrbitalDynamics.swift in Sources */,
+				306720952240498500F825AC /* OrbitMarker.swift in Sources */,
+				3067209922406C3100F825AC /* SwitchNode.swift in Sources */,
 				302EAD0C223BBA0E004DBCFC /* GameViewController.swift in Sources */,
+				3067209722405B7F00F825AC /* PlanetNode.swift in Sources */,
 				302EAD04223BBA0E004DBCFC /* AppDelegate.swift in Sources */,
 				30672093223F13E600F825AC /* OrbitingNode.swift in Sources */,
+				30582E402244D38200BE56D3 /* CGPoint+IsWithin.swift in Sources */,
+				30E94ADE2242E35D005AC4F1 /* CircleIntersection.swift in Sources */,
+				30582E3D22440D3100BE56D3 /* ButtonNode.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -304,7 +370,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = LQWS3ZT7UK;
-				INFOPLIST_FILE = DragTests/Info.plist;
+				INFOPLIST_FILE = "$(SRCROOT)/DragTests/Support Files/Info.plist";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -322,7 +388,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = LQWS3ZT7UK;
-				INFOPLIST_FILE = DragTests/Info.plist;
+				INFOPLIST_FILE = "$(SRCROOT)/DragTests/Support Files/Info.plist";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
