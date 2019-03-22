@@ -9,8 +9,8 @@
 import SpriteKit
 
 class PlanetNode: SKShapeNode {
-    let bodyMass: Double
-    let bodyRadius: Double
+    let bodyMass: CGFloat
+    let bodyRadius: CGFloat
     let scaledRepresentation = SKShapeNode()
 
     var displayState: DisplayState {
@@ -19,7 +19,7 @@ class PlanetNode: SKShapeNode {
         }
     }
 
-    init(mass: Double, radius: Double, atmosphereRadius: Float, displayState: DisplayState) {
+    init(mass: CGFloat, radius: CGFloat, atmosphereRadius: Float, displayState: DisplayState) {
         self.bodyMass = mass
         self.bodyRadius = radius
         self.displayState = displayState
@@ -32,8 +32,8 @@ class PlanetNode: SKShapeNode {
         strokeColor = SKColor.clear
 
         // Add a physics body
-        physicsBody = SKPhysicsBody(circleOfRadius: CGFloat(bodyRadius))
-        physicsBody?.mass = CGFloat(bodyMass)
+        physicsBody = SKPhysicsBody(circleOfRadius: bodyRadius)
+        physicsBody?.mass = bodyMass
         physicsBody?.pinned = true
         physicsBody?.collisionBitMask = 1
         physicsBody?.usesPreciseCollisionDetection = true
@@ -47,10 +47,10 @@ class PlanetNode: SKShapeNode {
 //        addChild(atmosphere)
 
         // Add a visual representation of the atmosphere
-        let atmosphereVisualization = SKShapeNode(circleOfRadius: CGFloat(radius))
+        let atmosphereVisualization = SKShapeNode(circleOfRadius: radius)
         atmosphereVisualization.strokeColor = SKColor.blue
         atmosphereVisualization.alpha = 0.5
-        atmosphereVisualization.glowWidth = CGFloat(atmosphereRadius) - CGFloat(radius)
+        atmosphereVisualization.glowWidth = CGFloat(atmosphereRadius) - radius
         atmosphereVisualization.zPosition = 1
         addChild(atmosphereVisualization)
 
@@ -65,11 +65,11 @@ class PlanetNode: SKShapeNode {
     }
 
     func redraw() {
-        self.path = CGPath.circle(at: position, ofRadius: CGFloat(bodyRadius))
+        self.path = CGPath.circle(at: position, ofRadius: bodyRadius)
 
         // Scaled circle parameters
         let midpoint = (Vector(position) * displayState.scale + displayState.translation).cgPoint
-        let radius = CGFloat(bodyRadius * displayState.scale)
+        let radius = bodyRadius * displayState.scale
 
         // Calculate the points of intersection of the circle and the viewport borders
         let vp = displayState.viewport

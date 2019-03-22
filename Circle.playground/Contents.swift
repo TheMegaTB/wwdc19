@@ -70,17 +70,17 @@ func iterate(from: CGFloat, to: CGFloat, limitedBy bound: CGFloat, clockwise: Bo
 }
 
 //iterate(from: -90.0, to: 90.0, limitedBy: 360.0, clockwise: true, stepSize: 1.0)
-//iterate(from: 1.25, to: 5.0, limitedBy: CGFloat(2 * Double.pi), clockwise: false, stepSize: 0.1) { angle in
+//iterate(from: 1.25, to: 5.0, limitedBy: CGFloat(2 * CGFloat.pi), clockwise: false, stepSize: 0.1) { angle in
 //    print(angle)
 //}
 
-let densityAtSeaLevel = 1.2250
-let gravitationalAcceleration = 9.80665
-let molarMassOfAir = 0.0289644
-let universalGasConstant = 8.31432
-let temperature = 273.15 + 20.0
-
-for altitude in 0...100000 {
-    let airDensity = densityAtSeaLevel * exp(-gravitationalAcceleration * molarMassOfAir * Double(altitude) / (universalGasConstant * temperature))
-    print(altitude, airDensity)
-}
+//let densityAtSeaLevel = 1.2250
+//let gravitationalAcceleration = 9.80665
+//let molarMassOfAir = 0.0289644
+//let universalGasConstant = 8.31432
+//let temperature = 273.15 + 20.0
+//
+//for altitude in 0...100000 {
+//    let airDensity = densityAtSeaLevel * exp(-gravitationalAcceleration * molarMassOfAir * CGFloat(altitude) / (universalGasConstant * temperature))
+//    print(altitude, airDensity)
+//}

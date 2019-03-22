@@ -27,15 +27,15 @@ class OrbitingNode: SKShapeNode {
         }
     }
 
-    var heightAboveTerrain: Double {
+    var heightAboveTerrain: CGFloat {
         return (Vector(position) - Vector(reference.position)).length - reference.bodyRadius
     }
 
-    var apoapsisHeight: Double {
+    var apoapsisHeight: CGFloat {
         return orbitalParameters.apoapsisHeight - reference.bodyRadius
     }
 
-    var periapsisHeight: Double {
+    var periapsisHeight: CGFloat {
         return orbitalParameters.periapsisHeight - reference.bodyRadius
     }
 
@@ -48,7 +48,7 @@ class OrbitingNode: SKShapeNode {
     private var localTime: TimeInterval = 0
     private let reference: PlanetNode
 
-    private let gravitationalConstant: Double = 6.674 * pow(10.0, -11.0)
+    private let gravitationalConstant: CGFloat = 6.674 * pow(10.0, -11.0)
 
     init(reference: PlanetNode, displayState: DisplayState) {
         orbitalLine = SKShapeNode()
@@ -100,32 +100,32 @@ class OrbitingNode: SKShapeNode {
             }
 
             // Calculate and apply the gravitational force
-            let G: CGFloat = CGFloat(gravitationalConstant)
+            let G: CGFloat = gravitationalConstant
             guard let m1 = physicsBody?.mass, let m2 = reference.physicsBody?.mass else { return }
             let pVec = Vector(position) - Vector(reference.position)
             let npVecNorm = pVec.normalized()
-            let r = CGFloat(pVec.length)
-            let F = Double((G * m1 * m2) / pow(r, 2))
+            let r = pVec.length
+            let F = (G * m1 * m2) / pow(r, 2)
             let FVec = npVecNorm * -F
             self.physicsBody?.applyForce(FVec.cgVector)
 
             // Calculate and apply the drag force
             let altitude = heightAboveTerrain
-            let densityAtSeaLevel = 1.2250 // Pa
-            let gravitationalAcceleration = 9.80665 // m / s^2
-            let molarMassOfAir = 0.0289644
-            let universalGasConstant = 8.31432
-            let temperature = 250.0 // kelvin
+            let densityAtSeaLevel: CGFloat = 1.2250 // Pa
+            let gravitationalAcceleration: CGFloat = 9.80665 // m / s^2
+            let molarMassOfAir: CGFloat = 0.0289644
+            let universalGasConstant: CGFloat = 8.31432
+            let temperature: CGFloat = 250.0 // kelvin
             let airDensity = densityAtSeaLevel * exp(-gravitationalAcceleration * molarMassOfAir * altitude / (universalGasConstant * temperature)) // Pa
 
-            let referenceArea = 12.0 // m^2
-            let dragCoefficient = 1.05
+            let referenceArea: CGFloat = 12.0 // m^2
+            let dragCoefficient: CGFloat = 1.05
             let velocity = Vector(physicsBody!.velocity)
             let dragForce = dragCoefficient / 2 * airDensity * pow(velocity.length, 2) * referenceArea
             let dragForceVector = dragForce * -velocity.normalized()
             self.physicsBody?.applyForce(dragForceVector.cgVector)
 
-            let dragAcceleration = dragForce / Double(self.physicsBody!.mass)
+            let dragAcceleration = dragForce / self.physicsBody!.mass
             let dragGForces = dragAcceleration / gravitationalAcceleration
             if dragGForces > 0.5 {
                 print(dragGForces)
@@ -140,7 +140,7 @@ class OrbitingNode: SKShapeNode {
         let entityPosition = Vector(position)
 
         let G = gravitationalConstant
-        let mu = G * Double(reference.bodyMass)
+        let mu = G * reference.bodyMass
         let eci = entityPosition - planetPosition
         let velocity = Vector(physicsBody!.velocity)
 
@@ -159,11 +159,9 @@ class OrbitingNode: SKShapeNode {
         }
 
         let (scale, translation, vp) = displayState
-        let cgScale = CGFloat(scale)
-        let cgTranslation = translation.cgVector
 
         // Fade out the orbit when zooming in
-        let orbitAlpha = 1.0 - cgScale * 2
+        let orbitAlpha = 1.0 - scale * 2
         orbitalLine.alpha = orbitAlpha
         apoapsisMarker.alpha = orbitAlpha
         periapsisMarker.alpha = orbitAlpha
@@ -177,7 +175,7 @@ class OrbitingNode: SKShapeNode {
             // (although the way of only drawing only the visible portion is kinda crude ... sorry)
             let path = CGMutablePath()
             let points = orbitalParameters.orbitPath().map {
-                CGPoint(x: $0.x * cgScale + cgTranslation.dx, y: $0.y * cgScale + cgTranslation.dy)
+                CGPoint(x: $0.x * scale + translation.x, y: $0.y * scale + translation.y)
             }.filter { $0.isWithin(rect: vp, marginOfError: 5000.0) }
             path.addLines(between: points)
             orbitalLine.path = path

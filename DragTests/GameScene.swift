@@ -9,7 +9,7 @@
 import SpriteKit
 import GameplayKit
 
-let earth = (radius: 6.3781 * pow(10.0, 6.0), mass: 5.9722 * pow(10.0, 24.0))
+let earth = (radius: CGFloat(6.3781 * pow(10.0, 6.0)), mass: CGFloat(5.9722 * pow(10.0, 24.0)))
 let simulationScale = 0.000003
 
 enum SimulationState {
@@ -17,7 +17,7 @@ enum SimulationState {
     case physics(speed: CGFloat)
 }
 
-typealias DisplayState = (scale: Double, translation: Vector, viewport: CGRect)
+typealias DisplayState = (scale: CGFloat, translation: Vector, viewport: CGRect)
 
 class GameScene: SKScene {
     private var currentUpdateCycleDT: TimeInterval = 0
@@ -140,7 +140,7 @@ class GameScene: SKScene {
         createEntity(at: CGPoint(x: earth.radius + 411000, y: 0))
     }
 
-    var previousCameraScale = CGFloat(1.0)
+    var previousCameraScale: CGFloat = 1.0
 
     @objc func pinchGestureAction(_ sender: UIPinchGestureRecognizer) {
         guard let camera = self.camera else {
@@ -267,7 +267,7 @@ class GameScene: SKScene {
             let defaultVector = Vector(planet.position) + Vector(0, 1, 0)
             let currentVector = Vector(camera.position) - Vector(planet.position)
             let angle = atan2(currentVector.y - defaultVector.y, currentVector.x - defaultVector.x)
-            camera.zRotation = CGFloat(angle)
+            camera.zRotation = angle
             print(angle)
 
             // TODO Orient the camera towards the planet to prevent confusion
@@ -281,7 +281,7 @@ class GameScene: SKScene {
     var displayState: DisplayState {
         guard let camera = camera else { return (scale: 1, translation: [0, 0], viewport: frame) }
 
-        let scale = Double(1 / camera.xScale)
+        let scale = 1 / camera.xScale
         let translation = -Vector(camera.position) * scale
         let frameOriginInScene = convertPoint(fromView: frame.origin)
         let frameOriginInCamera = convert(frameOriginInScene, to: camera)

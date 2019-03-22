@@ -19,36 +19,36 @@ infix operator •: DotProductPrecedence
 
 // Vector class inspired by: https://www.raywenderlich.com/650-overloading-custom-operators-in-swift
 struct Vector: Equatable, ExpressibleByArrayLiteral, CustomStringConvertible {
-    let x: Double
-    let y: Double
-    let z: Double
+    let x: CGFloat
+    let y: CGFloat
+    let z: CGFloat
 
     init(_ cgVector: CGVector) {
-        self.x = Double(cgVector.dx)
-        self.y = Double(cgVector.dy)
+        self.x = cgVector.dx
+        self.y = cgVector.dy
         self.z = 0
     }
 
     init(_ cgPoint: CGPoint) {
-        self.x = Double(cgPoint.x)
-        self.y = Double(cgPoint.y)
+        self.x = cgPoint.x
+        self.y = cgPoint.y
         self.z = 0
     }
 
-    init(_ x: Double, _ y: Double, _ z: Double) {
+    init(_ x: CGFloat, _ y: CGFloat, _ z: CGFloat) {
         self.x = x
         self.y = y
         self.z = z
     }
 
-    init(arrayLiteral: Double...) {
+    init(arrayLiteral: CGFloat...) {
         assert(arrayLiteral.count == 3, "Must initialize vector with 3 values.")
         self.x = arrayLiteral[0]
         self.y = arrayLiteral[1]
         self.z = arrayLiteral[2]
     }
 
-    init(_ array: [Double]) {
+    init(_ array: [CGFloat]) {
         assert(array.count == 3, "Must initialize vector with 3 values.")
         self.x = array[0]
         self.y = array[1]
@@ -59,7 +59,7 @@ struct Vector: Equatable, ExpressibleByArrayLiteral, CustomStringConvertible {
         return "(\(x), \(y), \(z))"
     }
 
-    var length: Double {
+    var length: CGFloat {
         return sqrt(x*x + y*y + z*z)
     }
 
@@ -71,7 +71,7 @@ struct Vector: Equatable, ExpressibleByArrayLiteral, CustomStringConvertible {
         return Vector(x / length, y / length, z / length)
     }
 
-    func rotate(by rotationMatrix: [[Double]]) -> Vector {
+    func rotate(by rotationMatrix: [[CGFloat]]) -> Vector {
         return Vector(
             Vector(rotationMatrix[0]) • self,
             Vector(rotationMatrix[1]) • self,
@@ -80,7 +80,7 @@ struct Vector: Equatable, ExpressibleByArrayLiteral, CustomStringConvertible {
     }
 
     // MARK: Operators
-    subscript(index: Int) -> Double {
+    subscript(index: Int) -> CGFloat {
         get {
             return [x, y, z][index]
         }
@@ -94,7 +94,7 @@ struct Vector: Equatable, ExpressibleByArrayLiteral, CustomStringConvertible {
         )
     }
 
-    static func •(left: Vector, right: Vector) -> Double {
+    static func •(left: Vector, right: Vector) -> CGFloat {
         return left.x * right.x + left.y * right.y + left.z * right.z
     }
 
@@ -110,15 +110,15 @@ struct Vector: Equatable, ExpressibleByArrayLiteral, CustomStringConvertible {
         return Vector(-vector.x, -vector.y, -vector.z)
     }
 
-    static func *(left: Double, right: Vector) -> Vector {
+    static func *(left: CGFloat, right: Vector) -> Vector {
         return Vector(right.x * left, right.y * left, right.z * left)
     }
 
-    static func *(left: Vector, right: Double) -> Vector {
+    static func *(left: Vector, right: CGFloat) -> Vector {
         return right * left
     }
 
-    static func /(left: Vector, right: Double) -> Vector {
+    static func /(left: Vector, right: CGFloat) -> Vector {
         return Vector(left.x / right, left.y / right, left.z / right)
     }
 
@@ -134,40 +134,40 @@ enum OrbitError: Error {
 typealias CartesianState = (position: Vector, velocity: Vector)
 
 struct OrbitalParameters {
-    let semiMajorAxis: Double               // a [m]
-    let eccentricity: Double                // e [1]
-    let argumentOfPeriapsis: Double         // ω [rad]
-    let longitudeOfAscendingNode: Double    // Ω [rad] - not needed for a 2D simulation but kept for future-proofing
-    let inclination: Double                 // i [rad]
-    let meanAnomaly: Double                 // M [rad]
+    let semiMajorAxis: CGFloat               // a [m]
+    let eccentricity: CGFloat                // e [1]
+    let argumentOfPeriapsis: CGFloat         // ω [rad]
+    let longitudeOfAscendingNode: CGFloat    // Ω [rad] - not needed for a 2D simulation but kept for future-proofing
+    let inclination: CGFloat                 // i [rad]
+    let meanAnomaly: CGFloat                 // M [rad]
 
-    let standardGravitationalParameter: Double  // μ
+    let standardGravitationalParameter: CGFloat  // μ
 
     var apoapsis: CartesianState {
-        return cartesianState(atAnomaly: Double.pi)
+        return cartesianState(atAnomaly: CGFloat.pi)
     }
 
     var periapsis: CartesianState {
         return cartesianState(atAnomaly: 0)
     }
 
-    var apoapsisHeight: Double {
+    var apoapsisHeight: CGFloat {
         return semiMajorAxis * (1 + eccentricity)
     }
 
-    var periapsisHeight: Double {
+    var periapsisHeight: CGFloat {
         return semiMajorAxis * (1 - eccentricity)
     }
 
     var orbitalPeriod: TimeInterval {
-        return 2 * Double.pi * sqrt(pow(semiMajorAxis, 3) / standardGravitationalParameter)
+        return Double(2 * CGFloat.pi * sqrt(pow(semiMajorAxis, 3) / standardGravitationalParameter))
     }
 
     var isHyperbolic: Bool {
         return eccentricity > 1
     }
 
-    init(positionVector r: Vector, velocityVector ṙ: Vector, gravitationalConstant μ: Double) {
+    init(positionVector r: Vector, velocityVector ṙ: Vector, gravitationalConstant μ: CGFloat) {
         // Orbital momentum
         let h = r * ṙ
 
@@ -178,11 +178,11 @@ struct OrbitalParameters {
         let n = [0, 0, 1] * h
 
         // True anomaly
-        let v: Double
+        let v: CGFloat
         if r • ṙ >= 0.0 {
             v = acos((e • r) / (e.length * r.length))
         } else {
-            v = 2 * Double.pi - acos((e • r) / (e.length * r.length))
+            v = 2 * CGFloat.pi - acos((e • r) / (e.length * r.length))
         }
 
         // Orbital inclination
@@ -197,23 +197,23 @@ struct OrbitalParameters {
         )
 
         // Longitude of the ascending node
-        let Ω: Double
-        if i == 0.0 || i == Double.pi {
+        let Ω: CGFloat
+        if i == 0.0 || i == CGFloat.pi {
             Ω = 0 // Zero by convention for non-inclined orbits
         } else if n.y >= 0 {
             Ω = acos(n.x / n.length)
         } else {
-            Ω = 2 * Double.pi - acos(n.x / n.length)
+            Ω = 2 * CGFloat.pi - acos(n.x / n.length)
         }
 
         // Argument of the periapsis
-        let ω: Double
+        let ω: CGFloat
         if ec == 0.0 {
             ω = 0 // Zero for elliptic orbits
         } else if (r * ṙ).z >= 0 {
             ω = atan2(e.y, e.x)
         } else {
-            ω = 2 * Double.pi - atan2(e.y, e.x)
+            ω = 2 * CGFloat.pi - atan2(e.y, e.x)
         }
 
         // Mean anomaly
@@ -233,7 +233,7 @@ struct OrbitalParameters {
         self.standardGravitationalParameter = μ
     }
 
-    func eccentricAnomaly(after interval: TimeInterval) throws -> Double {
+    func eccentricAnomaly(after interval: TimeInterval) throws -> CGFloat {
         if isHyperbolic {
             throw OrbitError.hyperbolicOrbit
         }
@@ -244,11 +244,11 @@ struct OrbitalParameters {
         let M0 = meanAnomaly
 
         // Mean anomaly after interval
-        let M: Double
+        let M: CGFloat
         if interval == 0 {
             M = M0
         } else {
-            M = M0 + interval * sqrt(μ / pow(semiMajorAxis, 3))
+            M = M0 + CGFloat(interval) * sqrt(μ / pow(semiMajorAxis, 3))
         }
 
         // Solve for eccentric anomaly E(t) with Newton-Raphson method
@@ -262,7 +262,7 @@ struct OrbitalParameters {
         return E
     }
 
-    func cartesianState(atAnomaly eccentricAnomaly: Double) -> CartesianState {
+    func cartesianState(atAnomaly eccentricAnomaly: CGFloat) -> CartesianState {
         // Few redeclarations for readability
         let a = semiMajorAxis
         let e = eccentricity
@@ -310,11 +310,11 @@ struct OrbitalParameters {
     }
 
     func orbitPath() -> [CGPoint] {
-        let stepSize = 0.001
-        var eccentricAnomaly = 0.0
+        let stepSize: CGFloat = 0.001
+        var eccentricAnomaly: CGFloat = 0.0
         var points: [CGPoint] = []
 
-        while eccentricAnomaly < 2 * Double.pi {
+        while eccentricAnomaly < 2 * CGFloat.pi {
             let (position, _) = cartesianState(atAnomaly: eccentricAnomaly)
             points.append(CGPoint(x: position.x, y: position.y))
 
