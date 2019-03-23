@@ -11,7 +11,16 @@ import SpriteKit
 class PlanetNode: SKShapeNode {
     let bodyMass: CGFloat
     let bodyRadius: CGFloat
+    let atmosphereHeight: CGFloat
     let scaledRepresentation = SKShapeNode()
+    private let atmosphereBorder: SKShapeNode
+    private let targetMarker = TargetMarker()
+
+    var targetAngle: CGFloat {
+        didSet {
+            redraw()
+        }
+    }
 
     var displayState: DisplayState {
         didSet {
@@ -19,10 +28,13 @@ class PlanetNode: SKShapeNode {
         }
     }
 
-    init(mass: CGFloat, radius: CGFloat, atmosphereRadius: Float, displayState: DisplayState) {
+    init(mass: CGFloat, radius: CGFloat, atmosphereRadius: Float, displayState: DisplayState, targetAngle: CGFloat) {
         self.bodyMass = mass
         self.bodyRadius = radius
+        self.atmosphereHeight = CGFloat(atmosphereRadius) - radius
         self.displayState = displayState
+        self.targetAngle = targetAngle
+        atmosphereBorder = SKShapeNode(circleOfRadius: CGFloat(atmosphereRadius))
 
         super.init()
 
@@ -38,26 +50,27 @@ class PlanetNode: SKShapeNode {
         physicsBody?.collisionBitMask = 1
         physicsBody?.usesPreciseCollisionDetection = true
 
-        // Add a dragging atmosphere
-//        let atmosphere = SKFieldNode.dragField()
-//        atmosphere.region = SKRegion(radius: atmosphereRadius)
-//        atmosphere.minimumRadius = Float(radius)
-//        atmosphere.strength = 1_000_000
-//        atmosphere.falloff = 1
-//        addChild(atmosphere)
-
         // Add a visual representation of the atmosphere
         let atmosphereVisualization = SKShapeNode(circleOfRadius: radius)
         atmosphereVisualization.strokeColor = SKColor.blue
         atmosphereVisualization.alpha = 0.5
         atmosphereVisualization.glowWidth = CGFloat(atmosphereRadius) - radius
-        atmosphereVisualization.zPosition = 1
+        atmosphereVisualization.zPosition = Layer.atmosphere
         addChild(atmosphereVisualization)
+
+        // Add a visual border to the atmosphere
+        atmosphereBorder.strokeColor = SKColor.white
+        atmosphereBorder.strokeShader = Shader.stroked
+        atmosphereBorder.zPosition = Layer.atmosphere
+        atmosphereBorder.lineWidth = 500
+        addChild(atmosphereBorder)
 
         // Setup a planet representation for precise drawing
         scaledRepresentation.fillColor = SKColor.orange
         scaledRepresentation.strokeColor = SKColor.orange
-        scaledRepresentation.zPosition = 5
+        scaledRepresentation.zPosition = Layer.entity
+
+        scaledRepresentation.addChild(targetMarker)
     }
 
     required init?(coder aDecoder: NSCoder) {
@@ -65,10 +78,14 @@ class PlanetNode: SKShapeNode {
     }
 
     func redraw() {
-        self.path = CGPath.circle(at: position, ofRadius: bodyRadius)
+        // Hide the atmosphere border if zoomed out too far
+        let borderScale = 1 / (displayState.scale * 2000) - 1
+        // Hidden if scale < 0.0005
+        // Gradually fade in until 0.00045
+        atmosphereBorder.alpha = 1 - min(1, max(0, borderScale))
 
         // Scaled circle parameters
-        let midpoint = (Vector(position) * displayState.scale + displayState.translation).cgPoint
+        let midpoint = (Vector(position) * displayState.scale + displayState.translation).cgPoint.rotated(by: displayState.rotation)
         let radius = bodyRadius * displayState.scale
 
         // Calculate the points of intersection of the circle and the viewport borders
@@ -127,7 +144,10 @@ class PlanetNode: SKShapeNode {
 
             // Add the corners of the edges crossed by the circle
             // TODO Their order may be wrong though ...
-            circlePoints += [D, C, B, A].filter { $0.isContainedBy(circleAt: midpoint, withRadius: radius) }
+            let cornerPoints = [A, B, C, D].filter { $0.isContainedBy(circleAt: midpoint, withRadius: radius) }
+            let orderedCorners = order(start: circlePoints.last!, points: cornerPoints)
+//            print("\(flipped)\n\(circlePoints.first!)\n\(circlePoints.last!)\n\(cornerPoints)\n")
+            circlePoints += orderedCorners
 
             let path = CGMutablePath()
             path.addLines(between: circlePoints)
@@ -135,25 +155,37 @@ class PlanetNode: SKShapeNode {
         } else {
             scaledRepresentation.path = CGPath.circle(at: midpoint, ofRadius: radius)
         }
+
+        targetMarker.position = CGPoint.onCircle(
+            angle: targetAngle + displayState.rotation,
+            circlePosition: midpoint,
+            circleRadius: radius
+        )
     }
 }
 
-extension CGPoint {
-    fileprivate static func onCircle(angle: CGFloat, circlePosition: CGPoint, circleRadius: CGFloat) -> CGPoint {
-        return CGPoint(x: circlePosition.x + circleRadius * cos(angle), y: circlePosition.y + circleRadius * sin(angle))
+extension PlanetNode {
+    static func `default`(withDisplayState: DisplayState, andTargetAngle: CGFloat) -> PlanetNode {
+        return PlanetNode(
+            mass: Planet.mass,
+            radius: Planet.radius,
+            atmosphereRadius: Float(Planet.radius + Planet.atmosphereHeight),
+            displayState: withDisplayState,
+            targetAngle: andTargetAngle
+        )
     }
 }
 
-extension CGPath {
-    fileprivate static func circle(at position: CGPoint, ofRadius radius: CGFloat) -> CGPath {
-        let path = CGMutablePath()
+fileprivate func order(start: CGPoint, points: [CGPoint]) -> [CGPoint] {
+    var remainingPoints = points
+    var resultingPoints: [CGPoint] = []
+    var previousPoint = start
 
-        let size = CGSize(width: radius * 2, height: radius * 2)
-        let origin = CGPoint(x: position.x - size.width/2, y: position.y - size.height/2)
-        let rect = CGRect(origin: origin, size: size)
-
-        path.addEllipse(in: rect)
-
-        return path
+    while let next = remainingPoints.first(where: { $0.roughlyOnSameAxisAs(previousPoint) }) {
+        resultingPoints.append(next)
+        remainingPoints.removeAll { $0 == next }
+        previousPoint = next
     }
+
+    return resultingPoints
 }

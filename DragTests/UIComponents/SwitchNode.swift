@@ -28,12 +28,13 @@ class SwitchNode: SKSpriteNode {
         labels = (on: labelOn, off: labelOff)
         label = SKLabelNode(text: labelOff)
         label.fontSize = 16
+        label.zPosition = Layer.ui
         label.position = CGPoint(x: 0, y: label.fontSize / 2 - size.height / 2)
 
         super.init(texture: nil, color: SKColor.lightGray, size: size)
 
         addChild(label)
-        zPosition = 10
+        zPosition = Layer.ui
         isUserInteractionEnabled = true
     }
 

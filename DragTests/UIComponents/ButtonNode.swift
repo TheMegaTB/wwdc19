@@ -23,20 +23,21 @@ class ButtonNode: SKSpriteNode {
         }
     }
 
-    init(text: String, _ callback: ((Bool) -> ())? = nil) {
-        let size = CGSize(width: 100, height: 32)
+    init(text: String, scale: CGFloat = 1.0, _ callback: ((Bool) -> ())? = nil) {
+        let size = CGSize(width: 100 * scale, height: 32 * scale)
 
         label = SKLabelNode(text: text)
-        label.fontSize = 16
+        label.fontSize = 16 * scale
         label.fontColor = SKColor.black
         label.position = CGPoint(x: 0, y: label.fontSize / 2 - size.height / 2)
+        label.zPosition = Layer.ui
 
         self.callback = callback
 
         super.init(texture: nil, color: SKColor.cyan, size: size)
 
         addChild(label)
-        zPosition = 10
+        zPosition = Layer.ui
         isUserInteractionEnabled = true
     }
 

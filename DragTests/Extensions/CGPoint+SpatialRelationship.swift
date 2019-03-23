@@ -19,4 +19,8 @@ extension CGPoint {
         let distanceFromCenter = sqrt(pow(distanceVector.dx, 2) + pow(distanceVector.dy, 2))
         return distanceFromCenter < radius
     }
+
+    func roughlyOnSameAxisAs(_ other: CGPoint, margin: CGFloat = 10.0) -> Bool {
+        return abs(self.x - other.x) < margin || abs(self.y - other.y) < margin
+    }
 }

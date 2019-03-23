@@ -8,7 +8,10 @@
 
 import SpriteKit
 
-class OrbitingNode: SKShapeNode {
+class OrbitingNode: CapsuleNode { // SKShapeNode {
+
+    var highestAcceleration: CGFloat = 0.0
+
     var onRails: Bool = true {
         didSet {
             physicsBody?.allowsRotation = !onRails
@@ -31,12 +34,29 @@ class OrbitingNode: SKShapeNode {
         return (Vector(position) - Vector(reference.position)).length - reference.bodyRadius
     }
 
+    var insideAtmosphere: Bool {
+        return heightAboveTerrain < reference.atmosphereHeight
+    }
+
     var apoapsisHeight: CGFloat {
         return orbitalParameters.apoapsisHeight - reference.bodyRadius
     }
 
     var periapsisHeight: CGFloat {
         return orbitalParameters.periapsisHeight - reference.bodyRadius
+    }
+
+    var landed: Bool {
+        let touchedDown = self.physicsBody!.allContactedBodies().contains(reference.physicsBody!)
+        let settled = Vector(self.physicsBody!.velocity).length < Game.settlingVelocityThreshold
+        return touchedDown && settled
+    }
+
+    var currentReferenceAngle: CGFloat {
+        let positionVector = Vector(position) - Vector(reference.position)
+        let referenceAngle: Vector = [1, 0, 0]
+        let angle = atan2(positionVector.y - referenceAngle.y, positionVector.x - referenceAngle.x)
+        return angle
     }
 
     var orbitalParameters: OrbitalParameters!
@@ -48,28 +68,22 @@ class OrbitingNode: SKShapeNode {
     private var localTime: TimeInterval = 0
     private let reference: PlanetNode
 
-    private let gravitationalConstant: CGFloat = 6.674 * pow(10.0, -11.0)
+    private let gravitationalConstant: CGFloat = Simulation.gravitationalConstant
+
+    private let deorbitParticles = SKEmitterNode(fileNamed: Emitter.deorbit)!
 
     init(reference: PlanetNode, displayState: DisplayState) {
         orbitalLine = SKShapeNode()
-        orbitalLine.strokeColor = SKColor.red.withAlphaComponent(0.5)
+        orbitalLine.strokeColor = SKColor.lightGray.withAlphaComponent(0.5)
         orbitalLine.lineWidth = 0.5
 
         self.reference = reference
 
         self.displayState = displayState
 
-        let size = CGSize(width: 72, height: 108)
-        let rect = CGRect(origin: CGPoint(x: -size.width / 2, y: -size.height / 2), size: size)
-
-        super.init()
-        path = CGPath(roundedRect: rect, cornerWidth: 2, cornerHeight: 2, transform: nil)
-
-        strokeColor = SKColor.purple
-        fillColor = SKColor.purple
-
-        physicsBody = SKPhysicsBody(rectangleOf: size)
-        physicsBody?.mass = 6400 // 419725 // Roughly the ISS weight
+        super.init(scale: 0.05)
+        
+        physicsBody?.mass = Capsule.mass
         physicsBody?.linearDamping = 0
         physicsBody?.angularDamping = 0
         physicsBody?.velocity = CGVector(dx: 0, dy: 7666) // ISS Orbital speed
@@ -77,6 +91,11 @@ class OrbitingNode: SKShapeNode {
         physicsBody?.allowsRotation = !onRails
         physicsBody?.collisionBitMask = onRails ? 0 : 0xFFFFFFFF
         physicsBody?.usesPreciseCollisionDetection = true
+
+        deorbitParticles.particleBirthRate = 0
+        deorbitParticles.zPosition = Layer.particles
+        deorbitParticles.particleZPosition = Layer.particles
+        addChild(deorbitParticles)
     }
 
     required init?(coder aDecoder: NSCoder) {
@@ -111,11 +130,11 @@ class OrbitingNode: SKShapeNode {
 
             // Calculate and apply the drag force
             let altitude = heightAboveTerrain
-            let densityAtSeaLevel: CGFloat = 1.2250 // Pa
-            let gravitationalAcceleration: CGFloat = 9.80665 // m / s^2
-            let molarMassOfAir: CGFloat = 0.0289644
-            let universalGasConstant: CGFloat = 8.31432
-            let temperature: CGFloat = 250.0 // kelvin
+            let densityAtSeaLevel: CGFloat = Planet.atmosphereDensity
+            let gravitationalAcceleration: CGFloat = Planet.gravitationalAcc
+            let molarMassOfAir: CGFloat = Simulation.molarMassOfAir
+            let universalGasConstant: CGFloat = Simulation.universalGasConstant
+            let temperature: CGFloat = Simulation.averageAirTemperature
             let airDensity = densityAtSeaLevel * exp(-gravitationalAcceleration * molarMassOfAir * altitude / (universalGasConstant * temperature)) // Pa
 
             let referenceArea: CGFloat = 12.0 // m^2
@@ -126,10 +145,16 @@ class OrbitingNode: SKShapeNode {
             self.physicsBody?.applyForce(dragForceVector.cgVector)
 
             let dragAcceleration = dragForce / self.physicsBody!.mass
-            let dragGForces = dragAcceleration / gravitationalAcceleration
-            if dragGForces > 0.5 {
-                print(dragGForces)
+            if dragAcceleration > highestAcceleration {
+                highestAcceleration = dragAcceleration
             }
+
+            // Spawn fire particles
+            let burnRate = max(dragAcceleration - 30, 0) * max(1 - airDensity, 0)
+            deorbitParticles.targetNode = parent
+            deorbitParticles.position = (velocity.normalized() * 100).cgPoint
+            deorbitParticles.particleBirthRate = burnRate * 100
+            deorbitParticles.alpha = min(1, burnRate * 0.5 - 150)
         }
 
         redrawPosition()
@@ -158,7 +183,7 @@ class OrbitingNode: SKShapeNode {
             return
         }
 
-        let (scale, translation, vp) = displayState
+        let (scale, translation, rotation, vp) = displayState
 
         // Fade out the orbit when zooming in
         let orbitAlpha = 1.0 - scale * 2
@@ -168,14 +193,14 @@ class OrbitingNode: SKShapeNode {
 
         if orbitAlpha > 0.0 {
             // Update the apoapsis and periapsis markers
-            apoapsisMarker.position = (orbitalParameters.apoapsis.position * scale + translation).cgPoint
-            periapsisMarker.position = (orbitalParameters.periapsis.position * scale + translation).cgPoint
+            apoapsisMarker.position = (orbitalParameters.apoapsis.position * scale + translation).cgPoint.rotated(by: rotation)
+            periapsisMarker.position = (orbitalParameters.periapsis.position * scale + translation).cgPoint.rotated(by: rotation)
 
             // Orbit path that is in the viewport
-            // (although the way of only drawing only the visible portion is kinda crude ... sorry)
+            // (although the way of only drawing the visible portion is kinda crude ... sorry)
             let path = CGMutablePath()
             let points = orbitalParameters.orbitPath().map {
-                CGPoint(x: $0.x * scale + translation.x, y: $0.y * scale + translation.y)
+                CGPoint(x: $0.x * scale + translation.x, y: $0.y * scale + translation.y).rotated(by: rotation)
             }.filter { $0.isWithin(rect: vp, marginOfError: 5000.0) }
             path.addLines(between: points)
             orbitalLine.path = path
@@ -183,6 +208,6 @@ class OrbitingNode: SKShapeNode {
     }
 
     func redrawPosition() {
-        positionMarker.position = (Vector(position) * displayState.scale + displayState.translation).cgPoint
+        positionMarker.position = (Vector(position) * displayState.scale + displayState.translation).cgPoint.rotated(by: displayState.rotation)
     }
 }

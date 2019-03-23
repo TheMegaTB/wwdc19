@@ -15,7 +15,7 @@ class GameViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
 
-        let sceneNode = GameScene(size: view.bounds.size)
+        let sceneNode = MenuScene(size: view.bounds.size) // GameScene(size: view.bounds.size)
 
         // Load 'GameScene.sks' as a GKScene. This provides gameplay related content
         // including entities and graphs.

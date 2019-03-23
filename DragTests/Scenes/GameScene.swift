@@ -9,25 +9,14 @@
 import SpriteKit
 import GameplayKit
 
-let earth = (radius: CGFloat(6.3781 * pow(10.0, 6.0)), mass: CGFloat(5.9722 * pow(10.0, 24.0)))
-let simulationScale = 0.000003
-
 enum SimulationState {
     case onRails(speed: CGFloat)
     case physics(speed: CGFloat)
 }
 
-typealias DisplayState = (scale: CGFloat, translation: Vector, viewport: CGRect)
+typealias DisplayState = (scale: CGFloat, translation: Vector, rotation: CGFloat, viewport: CGRect)
 
 class GameScene: SKScene {
-    private var currentUpdateCycleDT: TimeInterval = 0
-    private var lastUpdateTime : TimeInterval = 0
-
-    lazy var planet = PlanetNode(mass: earth.mass, radius: earth.radius, atmosphereRadius: Float(earth.radius + 100000), displayState: displayState)
-
-    override func sceneDidLoad() {
-        self.lastUpdateTime = 0
-    }
 
     var simulationState: SimulationState = .onRails(speed: 1000) {
         didSet {
@@ -60,26 +49,35 @@ class GameScene: SKScene {
         }
     }
 
-    let moveSwitch = SwitchNode(labelOn: "Create Mode", labelOff: "Move Mode")
-    let followSwitch = SwitchNode(labelOn: "Follow", labelOff: "Freecam")
-    let velocityLabel = SKLabelNode(text: nil)
-    let heightLabel = SKLabelNode(text: nil)
-    let apoapsisLabel = SKLabelNode(text: nil)
-    let periapsisLabel = SKLabelNode(text: nil)
+    private lazy var planet = PlanetNode.default(withDisplayState: displayState, andTargetAngle: 4.1)
+    private let moveSwitch = SwitchNode(labelOn: "Create Mode", labelOff: "Move Mode")
+    private let followSwitch = SwitchNode(labelOn: "Follow", labelOff: "Freecam")
+    private let velocityLabel = SKLabelNode(text: nil)
+    private let heightLabel = SKLabelNode(text: nil)
+    private let apoapsisLabel = SKLabelNode(text: nil)
+    private let periapsisLabel = SKLabelNode(text: nil)
 
-    let progradeBoostButton = ButtonNode(text: "Boost")
-    let retrogradeBoostButton = ButtonNode(text: "Break")
+    private let progradeBoostButton = ButtonNode(text: "Boost")
+    private let retrogradeBoostButton = ButtonNode(text: "Break")
+
+    private var previousCameraScale: CGFloat = 1.0
+    private var currentUpdateCycleDT: TimeInterval = 0
+    private var lastUpdateTime : TimeInterval = 0
+
+    override func sceneDidLoad() {
+        self.lastUpdateTime = 0
+    }
 
     override func didMove(to view: SKView) {
-        print(frame)
-
         /* Setup your scene here */
         simulationState = .onRails(speed: 1000)
 
         // Camera stuff
         let cameraNode = SKCameraNode()
         cameraNode.position = CGPoint(x: 0, y: 0)
-        cameraNode.setScale(40000)
+        let scalingAction = SKAction.scale(to: Camera.defaultScale, duration: 5)
+        scalingAction.timingMode = .easeOut
+        cameraNode.run(scalingAction)
 
         addChild(cameraNode)
         camera = cameraNode
@@ -92,12 +90,12 @@ class GameScene: SKScene {
 
         velocityLabel.position = CGPoint(x: 0, y: 290)
         velocityLabel.fontSize = 25
-        velocityLabel.zPosition = 10
+        velocityLabel.zPosition = Layer.ui
         cameraNode.addChild(velocityLabel)
 
         heightLabel.position = CGPoint(x: 0, y: 320)
         heightLabel.fontSize = 25
-        heightLabel.zPosition = 10
+        heightLabel.zPosition = Layer.ui
         cameraNode.addChild(heightLabel)
 
         retrogradeBoostButton.position = CGPoint(x: -50, y: -250)
@@ -108,15 +106,15 @@ class GameScene: SKScene {
 
         apoapsisLabel.position = CGPoint(x: 0, y: -300)
         apoapsisLabel.fontSize = 25
-        apoapsisLabel.zPosition = 10
+        apoapsisLabel.zPosition = Layer.ui
         cameraNode.addChild(apoapsisLabel)
 
         periapsisLabel.position = CGPoint(x: 0, y: -330)
         periapsisLabel.fontSize = 25
-        periapsisLabel.zPosition = 10
+        periapsisLabel.zPosition = Layer.ui
         cameraNode.addChild(periapsisLabel)
 
-        let timewarpButton = SwitchNode(labelOn: "Off-Rails", labelOff: "On-Rails") { newState in
+        let timewarpButton = SwitchNode(labelOn: "Off-Rails", labelOff: "On-Rails") { [unowned self] newState in
             if newState {
                 self.simulationState = .physics(speed: 1)
             } else {
@@ -137,10 +135,9 @@ class GameScene: SKScene {
         view.addGestureRecognizer(pinchGesture)
 
         // Testing
-        createEntity(at: CGPoint(x: earth.radius + 411000, y: 0))
+        createEntity(at: CGPoint(x: planet.bodyRadius + 411000, y: 0))
     }
 
-    var previousCameraScale: CGFloat = 1.0
 
     @objc func pinchGestureAction(_ sender: UIPinchGestureRecognizer) {
         guard let camera = self.camera else {
@@ -222,7 +219,7 @@ class GameScene: SKScene {
 
         // Add boost to orbiting entity 0
         if let physicsEntity = orbitingEntities.first?.physicsBody {
-            let force = Vector(physicsEntity.velocity).normalized() * 934000
+            let force = Vector(physicsEntity.velocity).normalized() * Capsule.thrust
             if progradeBoostButton.pushed {
                 physicsEntity.applyForce(force.cgVector)
             } else if retrogradeBoostButton.pushed {
@@ -232,7 +229,27 @@ class GameScene: SKScene {
     }
 
     override func update(_ currentTime: TimeInterval) {
-        // Called before each frame is rendered
+        // Limit the time/physics warp speed
+        // - No rails warp in atmosphere
+        // - Rails warp only at speed=100 below 220km
+        // - Physics warp only at speed=1 below 1km
+        if let entity = self.orbitingEntities.first {
+            let atmoHeight = Planet.atmosphereHeight
+            let entityHeight = entity.heightAboveTerrain
+
+            switch simulationState {
+            case .onRails(let speed):
+                if entityHeight < atmoHeight {
+                    simulationState = .physics(speed: 10)
+                } else if entityHeight < atmoHeight + 120000 && speed > 1 {
+                    simulationState = .onRails(speed: 100)
+                }
+            case .physics(let speed):
+                if entityHeight < 1000 && speed > 1 {
+                    simulationState = .physics(speed: 1)
+                }
+            }
+        }
 
         // Initialize _lastUpdateTime if it has not already been
         if (self.lastUpdateTime == 0) {
@@ -261,35 +278,66 @@ class GameScene: SKScene {
             periapsisLabel.text = String(format: "Periapsis: %.0f km", entity.periapsisHeight / 1000)
         }
 
-        // Realign and reorient the camera if we are in follow mode
-        if followSwitch.state, let camera = camera {
-            // Calculate the angle between the camera and the planet
+        guard let camera = camera, let entity = orbitingEntities.first else {
+            return
+        }
+
+        // Realign the camera if we are in follow mode
+        if followSwitch.state {
+            camera.position = orbitingEntities[0].position
+        }
+
+        // Orient the camera towards the planet if inside the atmosphere and follow mode is on
+        if followSwitch.state && entity.insideAtmosphere {
             let defaultVector = Vector(planet.position) + Vector(0, 1, 0)
             let currentVector = Vector(camera.position) - Vector(planet.position)
             let angle = atan2(currentVector.y - defaultVector.y, currentVector.x - defaultVector.x)
-            camera.zRotation = angle - CGFloat.pi / 2
+            camera.run(SKAction.rotate(toAngle: angle - CGFloat.pi / 2, duration: 1.5, shortestUnitArc: true))
+        }
 
-            // TODO Orient the camera towards the planet to prevent confusion
-            camera.position = orbitingEntities[0].position
-            propagateDisplayState()
-        } else {
-            camera?.zRotation = 0
+        // Reset the camera rotation
+        if (!entity.insideAtmosphere || !followSwitch.state) && camera.zRotation != 0 {
+            camera.run(SKAction.rotate(toAngle: 0, duration: 1.5, shortestUnitArc: true))
+        }
+
+        propagateDisplayState()
+    }
+
+    override func didFinishUpdate() {
+        if let entity = orbitingEntities.first, entity.landed {
+            let targetAngle = (planet.targetAngle + CGFloat.pi).truncatingRemainder(dividingBy: 2 * CGFloat.pi)
+            let currentAngle = (entity.currentReferenceAngle + CGFloat.pi).truncatingRemainder(dividingBy: 2 * CGFloat.pi)
+            // TODO The deltaAngle can be negative. Fix it
+            let deltaAngle = max(targetAngle, currentAngle) - min(targetAngle, currentAngle)
+            let closenessFactor = 1 - deltaAngle / CGFloat.pi // 1 = on-spot, 0 = furthest it gets
+            let landingSpotScore = Game.landingSpotScore * closenessFactor
+
+            let score = Int(round(landingSpotScore)) // TODO Add remaining fuel score
+            var gameEndState: GameEndState = .landed(score: score)
+
+            if entity.highestAcceleration > Game.maximumAcceleration {
+                gameEndState = .died(reason: DeathReason.crushedToBits(acceleration: entity.highestAcceleration))
+            }
+
+            let gameEndedScene = GameEndedScene(size: self.size, gameEndState: gameEndState)
+            gameEndedScene.scaleMode = .aspectFill
+            self.scene!.view!.presentScene(gameEndedScene, transition: SKTransition.crossFade(withDuration: 1))
         }
     }
 
     var displayState: DisplayState {
-        guard let camera = camera else { return (scale: 1, translation: [0, 0], viewport: frame) }
+        guard let camera = camera else { return (scale: 1, translation: [0, 0], rotation: 0, viewport: frame) }
 
         let scale = 1 / camera.xScale
         let translation = -Vector(camera.position) * scale
         let frameOriginInScene = convertPoint(fromView: frame.origin)
         let frameOriginInCamera = convert(frameOriginInScene, to: camera)
         let viewport = CGRect(
-            origin: CGPoint(x: frameOriginInCamera.x, y: -frameOriginInCamera.y), // For some weird reason y is flipped.
+            origin: CGPoint(x: frameOriginInCamera.x, y: -frameOriginInCamera.y),
             size: frame.size
         )
 
-        return (scale: scale, translation: translation, viewport: viewport)
+        return (scale: scale, translation: translation, rotation: -camera.zRotation, viewport: viewport)
     }
 
     func propagateDisplayState() {
