@@ -124,8 +124,8 @@
 			children = (
 				30582E442244DAB200BE56D3 /* Support Files */,
 				302EAD03223BBA0E004DBCFC /* AppDelegate.swift */,
-				30582E472244ECD800BE56D3 /* Constants.swift */,
 				302EAD0B223BBA0E004DBCFC /* GameViewController.swift */,
+				30582E472244ECD800BE56D3 /* Constants.swift */,
 				301A00DA22466630007DA092 /* Particles */,
 				301A00D522458372007DA092 /* Scenes */,
 				30582E432244DA6B00BE56D3 /* Maths */,

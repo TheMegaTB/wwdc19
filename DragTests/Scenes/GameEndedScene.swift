@@ -23,6 +23,7 @@ class GameEndedScene: SKScene {
     let gameEndState: GameEndState
     let titleNode = SKLabelNode()
     let subtitleNode = SKLabelNode()
+    var newGameButton: ButtonNode!
 
     init(size: CGSize, gameEndState: GameEndState) {
         self.gameEndState = gameEndState
@@ -58,6 +59,17 @@ class GameEndedScene: SKScene {
                 crushedToBits(acceleration)
             }
         }
+
+        newGameButton = ButtonNode(text: "Restart") { _ in
+            let targetScene = GameScene(size: self.size)
+            targetScene.scaleMode = .aspectFill
+            let transition = SKTransition.fade(withDuration: 2)
+            transition.pausesOutgoingScene = false
+            transition.pausesIncomingScene = false
+            self.scene!.view!.presentScene(targetScene, transition: transition)
+        }
+        newGameButton.position = CGPoint(x: 0, y: 50)
+        addChild(newGameButton)
     }
 
     var viewport: CGRect {
@@ -88,6 +100,8 @@ class GameEndedScene: SKScene {
     func crushedToBits(_ acceleration: CGFloat) {
         subtitleNode.text = String(format: "You were crushed by %.2fG", acceleration / Planet.gravitationalAcc)
         addGround()
+        let capsule = addCapsule()
+        capsule.physicsBody?.velocity = CGVector(dx: 0, dy: -acceleration * 10)
     }
 
     func touchdownConfirmed(_ score: Int) {
@@ -106,9 +120,11 @@ class GameEndedScene: SKScene {
     func centerText() {
         titleNode.position = CGPoint(x: 0, y: 50)
         subtitleNode.position = CGPoint(x: 0, y: -50)
+        newGameButton.position = CGPoint(x: 0, y: -150)
     }
 
-    func addCapsule() {
+    @discardableResult
+    func addCapsule() -> CapsuleNode {
         let viewport = self.viewport
 
         let capsule = CapsuleNode()
@@ -117,6 +133,8 @@ class GameEndedScene: SKScene {
         capsule.physicsBody?.angularVelocity = 0.25
         capsule.physicsBody?.restitution = 0.3
         addChild(capsule)
+
+        return capsule
     }
 
     func addGround() {
