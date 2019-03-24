@@ -8,18 +8,14 @@
 
 import SpriteKit
 
-enum ThrusterState {
-    case prograde
-    case retrograde
-    case disabled
-}
-
 class OrbitingNode: CapsuleNode {
 
     var highestAcceleration: CGFloat = 0.0
     var remainingBurnTime: TimeInterval = Capsule.secondsOfThrust
+    var heat: CGFloat = 0.0
+    var remainingHeatShield: CGFloat = Capsule.heatShieldCapacity
 
-    var thrusterState: ThrusterState = .disabled
+    var thrusterState: Bool = false
 
     var onRails: Bool = true {
         didSet {
@@ -68,7 +64,12 @@ class OrbitingNode: CapsuleNode {
         return angle
     }
 
-    var orbitalParameters: OrbitalParameters!
+    var orbitalParameters: OrbitalParameters! {
+        didSet {
+            redrawOrbit()
+            redrawPosition()
+        }
+    }
     private(set) var orbitalLine: SKShapeNode
     private(set) var periapsisMarker: OrbitMarker = OrbitMarker(label: "Periapsis")
     private(set) var apoapsisMarker: OrbitMarker = OrbitMarker(label: "Apoapsis")
@@ -80,6 +81,8 @@ class OrbitingNode: CapsuleNode {
     private let gravitationalConstant: CGFloat = Simulation.gravitationalConstant
 
     private let deorbitParticles = SKEmitterNode(fileNamed: Emitter.deorbit)!
+    private let thrusterParticles1 = SKEmitterNode(fileNamed: Emitter.thruster)!
+    private let thrusterParticles2 = SKEmitterNode(fileNamed: Emitter.thruster)!
 
     init(reference: PlanetNode, displayState: DisplayState) {
         orbitalLine = SKShapeNode()
@@ -91,6 +94,8 @@ class OrbitingNode: CapsuleNode {
         self.displayState = displayState
 
         super.init(scale: 0.05)
+
+        zPosition = Layer.entity
         
         physicsBody?.mass = Capsule.mass
         physicsBody?.linearDamping = 0
@@ -105,6 +110,26 @@ class OrbitingNode: CapsuleNode {
         deorbitParticles.zPosition = Layer.particles
         deorbitParticles.particleZPosition = Layer.particles
         addChild(deorbitParticles)
+
+        // Thruster
+        thrusterParticles1.particleBirthRate = 0
+        thrusterParticles2.particleBirthRate = 0
+
+        thrusterParticles1.zPosition = Layer.particles
+        thrusterParticles2.zPosition = Layer.particles
+        thrusterParticles1.particleZPosition = Layer.particles
+        thrusterParticles2.particleZPosition = Layer.particles
+
+        thrusterParticles1.position = CGPoint(x: super.width / 2, y: 0)
+        thrusterParticles2.position = CGPoint(x: -super.width / 2, y: 0)
+
+        addChild(thrusterParticles1)
+        addChild(thrusterParticles2)
+
+        let headingMarker = SKShapeNode(circleOfRadius: 4)
+        headingMarker.fillColor = SKColor.white
+        headingMarker.position = CGPoint(x: 0, y: 18)
+        positionMarker.addChild(headingMarker)
     }
 
     required init?(coder aDecoder: NSCoder) {
@@ -116,6 +141,9 @@ class OrbitingNode: CapsuleNode {
 
         let dT = deltaTime * Double(speed)
         localTime += dT
+
+        // Reduce the heat according to dT
+        heat = max(0, heat - CGFloat(dT) * Capsule.heatDissapationPerSecond)
 
         if onRails {
             let (position, speed) = try orbitalParameters.cartesianState(after: localTime)
@@ -164,26 +192,46 @@ class OrbitingNode: CapsuleNode {
             // Spawn fire particles
             let burnRate = max(dragAcceleration - 30, 0) * max(1 - airDensity, 0)
             deorbitParticles.targetNode = parent
-            deorbitParticles.position = (velocity.normalized() * 100).cgPoint
             deorbitParticles.particleBirthRate = burnRate * 100
             deorbitParticles.alpha = min(1, burnRate * 0.5 - 150)
 
+            // Calculate heat
+            let addedHeat = burnRate * speed
+            let pointingVector = Vector(-1 * sin(zRotation), 1 * cos(zRotation), 0)
+            let heatShieldAbsorptionPercentage = 1 - ((velocity.normalized() • pointingVector) + 1) / 2
+            let heatShieldPart = heatShieldAbsorptionPercentage * addedHeat
+            var remainingPart = addedHeat - heatShieldPart
+            remainingHeatShield -= heatShieldPart
+
+            // If the heat shield got depleted add the remaining heat back to the capsule
+            if remainingHeatShield < 0.0 {
+                remainingPart += abs(remainingHeatShield)
+                remainingHeatShield = 0.0
+            }
+            
+            heat += remainingPart
+
             // Disable the thruster when there is no burn time remaining
             if remainingBurnTime <= 0.0 {
-                thrusterState = .disabled
+                thrusterState = false
             }
 
             // Apply thruster force
-            let force = Vector(physicsBody.velocity).normalized() * Capsule.thrust
-            switch thrusterState {
-            case .prograde:
-                physicsBody.applyForce(force.cgVector)
+            let rotation = self.zRotation
+            let force = CGVector(dx: 0, dy: Capsule.thrust)
+            let rotatedForce = CGVector(
+                dx: force.dx * cos(rotation) - force.dy * sin(rotation),
+                dy: force.dx * sin(rotation) + force.dy * cos(rotation)
+            )
+
+            if thrusterState {
+                physicsBody.applyForce(rotatedForce)
                 remainingBurnTime -= dT
-            case .retrograde:
-                physicsBody.applyForce((-force).cgVector)
-                remainingBurnTime -= dT
-            case .disabled:
-                break
+                thrusterParticles1.particleBirthRate = 450
+                thrusterParticles2.particleBirthRate = 450
+            } else {
+                thrusterParticles1.particleBirthRate = 0
+                thrusterParticles2.particleBirthRate = 0
             }
         }
 
@@ -201,12 +249,9 @@ class OrbitingNode: CapsuleNode {
 
         localTime = 0
         orbitalParameters = OrbitalParameters(positionVector: eci, velocityVector: velocity, gravitationalConstant: mu)
-        redrawOrbit()
-        redrawPosition()
     }
 
     func redrawOrbit() {
-        // TODO Don't draw orbit when we are on the ground.
         guard !orbitalParameters.isHyperbolic else {
             orbitalLine.path = nil
             // TODO Hide the apo-/periapsis markers
@@ -239,5 +284,6 @@ class OrbitingNode: CapsuleNode {
 
     func redrawPosition() {
         positionMarker.position = (Vector(position) * displayState.scale + displayState.translation).cgPoint.rotated(by: displayState.rotation)
+        positionMarker.zRotation = zRotation
     }
 }

@@ -97,6 +97,7 @@ class Slider: SKNode {
     }
 
     func redrawStepLimit() {
+        // TODO This doesn't work if the stepLimit is >stepCount
         guard stepLimit < stepCount else { return }
         let position = positionXValues[stepLimit]
         let stepWidth = CGFloat(width) / CGFloat(stepCount - 1)

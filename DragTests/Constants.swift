@@ -24,6 +24,9 @@ struct Capsule {
     static let mass: CGFloat = 6400     // [kg]
     static let thrust: CGFloat = 934000 // [N]
     static let secondsOfThrust: TimeInterval = 10
+    static let heatDissapationPerSecond: CGFloat = 10
+    static let heatShieldCapacity: CGFloat = 200000
+    static let heatLimit: CGFloat = 15000
 }
 
 struct Simulation {
@@ -42,6 +45,7 @@ struct Emitter {
     static let deorbit = "DeorbitParticles.sks"
     static let menu = "MenuParticles.sks"
     static let stars = "Stars.sks"
+    static let thruster = "ThrusterParticles.sks"
 }
 
 struct Game {

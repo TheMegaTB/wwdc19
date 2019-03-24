@@ -95,6 +95,8 @@ class CapsuleNode: SKShapeNode {
         hatch.strokeColor = hatch.fillColor
         addChild(hatch)
 
+        hatch.zPosition = Layer.entity
+
         return hatchPath
     }
 
@@ -112,6 +114,7 @@ class CapsuleNode: SKShapeNode {
         let heatShield = SKShapeNode(path: heatShieldPath)
         heatShield.fillColor = SKColor.red
         heatShield.strokeColor = heatShield.fillColor
+        heatShield.zPosition = Layer.entity
         addChild(heatShield)
 
         return heatShieldPath

@@ -49,6 +49,19 @@ struct OrbitalParameters {
         return eccentricity > 1
     }
 
+    init(semiMajorAxis: CGFloat, eccentricity: CGFloat, gravitationalConstant μ: CGFloat) {
+        // Set everything unrelated to 0
+        self.argumentOfPeriapsis = 0.0
+        self.longitudeOfAscendingNode = 0.0
+        self.inclination = 0.0
+        self.meanAnomaly = CGFloat.pi
+
+        // Initialize with parameters
+        self.semiMajorAxis = semiMajorAxis
+        self.eccentricity = eccentricity
+        self.standardGravitationalParameter = μ
+    }
+
     init(positionVector r: Vector, velocityVector ṙ: Vector, gravitationalConstant μ: CGFloat) {
         // Orbital momentum
         let h = r * ṙ

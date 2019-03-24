@@ -66,8 +66,8 @@ class PlanetNode: SKShapeNode {
         addChild(atmosphereBorder)
 
         // Setup a planet representation for precise drawing
-        scaledRepresentation.fillColor = SKColor.orange
-        scaledRepresentation.strokeColor = SKColor.orange
+        scaledRepresentation.fillColor = SKColor.init(red: 0.3, green: 0.7, blue: 0.3, alpha: 1.0)
+        scaledRepresentation.strokeColor = scaledRepresentation.fillColor
         scaledRepresentation.zPosition = Layer.entity
 
         scaledRepresentation.addChild(targetMarker)

@@ -44,10 +44,17 @@ public class GameScene: SKScene {
     private let apoapsisLabel = SKLabelNode(text: nil)
     private let periapsisLabel = SKLabelNode(text: nil)
 
-    private let progradeBoostButton = ButtonNode(text: "Boost")
-    private let retrogradeBoostButton = ButtonNode(text: "Break")
+    private let rotateLeft = ButtonNode(text: "Turn left")
+    private let rotateRight = ButtonNode(text: "Turn right")
+    private let burn = ButtonNode(text: "Ignite engine")
+
+    private let fuelGauge = Gauge(text: "Fuel", width: 250, topLabel: true)
+    private let heatGauge = Gauge(text: "Capsule heat", width: 250, topLabel: true, color: SKColor.red)
+    private let heatShieldGauge = Gauge(text: "Heat shield", width: 250, color: SKColor.red)
 
     private var timewarpSlider: TimeWarpSlider!
+
+    private let stars = SKEmitterNode(fileNamed: Emitter.stars)!
 
     private var previousCameraScale: CGFloat = 1.0
     private var currentUpdateCycleDT: TimeInterval = 0
@@ -60,55 +67,82 @@ public class GameScene: SKScene {
     public override func didMove(to view: SKView) {
         let cameraNode = SKCameraNode()
         cameraNode.position = CGPoint(x: 0, y: 0)
-        let scalingAction = SKAction.scale(to: Camera.defaultScale, duration: 5)
+        cameraNode.setScale(Camera.defaultScale)
+        let scalingAction = SKAction.scale(to: 1, duration: 3)
         scalingAction.timingMode = .easeOut
-        cameraNode.run(scalingAction)
+        let delayedScaling = SKAction.sequence([
+            SKAction.wait(forDuration: 2),
+            scalingAction
+        ])
+        // TODO This closure is escaping -> make self weak. [unowned self] doesn't work oddly enough
+        cameraNode.run(delayedScaling) {
+            self.timewarpSlider.snapHandleToPosition(position: 0)
+        }
+
+        followSwitch.state = true
 
         addChild(cameraNode)
         camera = cameraNode
 
-        followSwitch.position = CGPoint(x: 0, y: -220)
-        cameraNode.addChild(followSwitch)
+        cameraNode.addChild(stars)
 
 //        moveSwitch.position = CGPoint(x: -50, y: 200)
 //        cameraNode.addChild(moveSwitch)
 
-        velocityLabel.position = CGPoint(x: 0, y: 290)
+        var centerYOffset = 210
+        if let height = UIScreen.main.currentMode?.size.height, height < 2700 {
+            centerYOffset = 150
+        }
+
+        velocityLabel.position = CGPoint(x: 120, y: centerYOffset + 80)
         velocityLabel.fontSize = 25
         velocityLabel.zPosition = Layer.ui
         cameraNode.addChild(velocityLabel)
 
-        heightLabel.position = CGPoint(x: 0, y: 320)
+        heightLabel.position = CGPoint(x: 120, y: centerYOffset + 110)
         heightLabel.fontSize = 25
         heightLabel.zPosition = Layer.ui
         cameraNode.addChild(heightLabel)
 
-        retrogradeBoostButton.position = CGPoint(x: -50, y: -250)
-        retrogradeBoostButton.callback = { [unowned self] enabled in
-            self.orbitingEntities.first?.thrusterState = enabled ? .retrograde : .disabled
-        }
-        cameraNode.addChild(retrogradeBoostButton)
-
-        progradeBoostButton.position = CGPoint(x: 50, y: -250)
-        progradeBoostButton.callback = { [unowned self] enabled in
-            self.orbitingEntities.first?.thrusterState = enabled ? .prograde : .disabled
-        }
-        cameraNode.addChild(progradeBoostButton)
-
-        apoapsisLabel.position = CGPoint(x: 0, y: -300)
+        apoapsisLabel.position = CGPoint(x: -120, y: centerYOffset + 110)
         apoapsisLabel.fontSize = 25
         apoapsisLabel.zPosition = Layer.ui
         cameraNode.addChild(apoapsisLabel)
 
-        periapsisLabel.position = CGPoint(x: 0, y: -330)
+        periapsisLabel.position = CGPoint(x: -120, y: centerYOffset + 80)
         periapsisLabel.fontSize = 25
         periapsisLabel.zPosition = Layer.ui
         cameraNode.addChild(periapsisLabel)
 
+        rotateLeft.position = CGPoint(x: -50, y: -centerYOffset - 40)
+        cameraNode.addChild(rotateLeft)
+
+        rotateRight.position = CGPoint(x: 50, y: -centerYOffset - 40)
+        cameraNode.addChild(rotateRight)
+
+        followSwitch.position = CGPoint(x: -50, y: -centerYOffset - 80)
+        cameraNode.addChild(followSwitch)
+
+        burn.position = CGPoint(x: 50, y: -centerYOffset - 80)
+        burn.callback = { [unowned self] enabled in
+            self.orbitingEntities.first?.thrusterState = enabled
+        }
+        cameraNode.addChild(burn)
+
+        fuelGauge.position = CGPoint(x: 0, y: -centerYOffset)
+        cameraNode.addChild(fuelGauge)
+
+        heatGauge.position = CGPoint(x: 0, y: -centerYOffset - 140)
+        cameraNode.addChild(heatGauge)
+
+        heatShieldGauge.position = CGPoint(x: 0, y: -centerYOffset - 155)
+        cameraNode.addChild(heatShieldGauge)
+
         timewarpSlider = TimeWarpSlider() { [unowned self] newState in
             self.simulationState = newState
         }
-        timewarpSlider.position = CGPoint(x: 0, y: 220)
+        timewarpSlider.position = CGPoint(x: 0, y: centerYOffset + 10)
+        timewarpSlider.snapHandleToPosition(position: 3)
         cameraNode.addChild(timewarpSlider)
 
         self.physicsWorld.gravity =  CGVector(dx: 0.0, dy: 0.0)
@@ -123,7 +157,6 @@ public class GameScene: SKScene {
 
         createEntity(at: CGPoint(x: planet.bodyRadius + 411000, y: 0))
     }
-
 
     @objc private func pinchGestureAction(_ sender: UIPinchGestureRecognizer) {
         guard let camera = self.camera else {
@@ -148,9 +181,19 @@ public class GameScene: SKScene {
     func createEntity(at position: CGPoint) {
         let p = OrbitingNode(reference: planet, displayState: displayState)
         p.position = position
+        p.physicsBody?.angularDamping = 0.75
+
+        // Generate a random orbit
+//        let eccentricity: CGFloat = CGFloat.random(in: 0.1..<0.5)
+//        let semiMajorAxis: CGFloat = CGFloat.random(in: (planet.bodyRadius + 105_000) ... (planet.bodyRadius + 500_000)) //* 1/eccentricity
+//        p.orbitalParameters = OrbitalParameters(
+//            semiMajorAxis: semiMajorAxis,
+//            eccentricity: eccentricity,
+//            gravitationalConstant: Simulation.gravitationalConstant * planet.bodyMass
+//        )
         p.updateOrbit()
         updateSimulationState(of: p)
-        print(p.orbitalParameters)
+        
         camera?.addChild(p.orbitalLine)
         camera?.addChild(p.apoapsisMarker)
         camera?.addChild(p.periapsisMarker)
@@ -218,23 +261,6 @@ public class GameScene: SKScene {
     }
 
     public override func update(_ currentTime: TimeInterval) {
-        // Limit the time/physics warp speed
-        if let entity = self.orbitingEntities.first {
-            let atmoHeight = Planet.atmosphereHeight
-            let entityHeight = entity.heightAboveTerrain
-
-            if entityHeight < 1000 {
-                timewarpSlider.stepLimit = 1
-            } else if entityHeight < atmoHeight {
-                timewarpSlider.stepLimit = 2
-            } else if entityHeight < atmoHeight + 1000 {
-                timewarpSlider.stepLimit = 3
-            } else if entityHeight < atmoHeight + 120000 {
-                timewarpSlider.stepLimit = 4
-            } else {
-                timewarpSlider.stepLimit = 6
-            }
-        }
 
         // Initialize _lastUpdateTime if it has not already been
         if (self.lastUpdateTime == 0) {
@@ -247,6 +273,43 @@ public class GameScene: SKScene {
 
         // Update the position of all entities
         updateOrbitingEntities(deltaTime: dt)
+
+        guard let entity = orbitingEntities.first else { return }
+
+        // Limit the time/physics warp speed
+        let atmoHeight = Planet.atmosphereHeight
+        let entityHeight = entity.heightAboveTerrain
+
+        if entityHeight < 250 {
+            timewarpSlider.stepLimit = 0
+        } else if entityHeight < 1000 {
+            timewarpSlider.stepLimit = 1
+        } else if entityHeight < atmoHeight {
+            timewarpSlider.stepLimit = 2
+        } else if entityHeight < atmoHeight + 1000 {
+            timewarpSlider.stepLimit = 3
+        } else if entityHeight < atmoHeight + 120000 {
+            timewarpSlider.stepLimit = 4
+        } else {
+            timewarpSlider.stepLimit = 6
+        }
+
+        // Rotate the capsule
+        let angularImpulse: CGFloat = 0.25
+        if rotateLeft.pushed {
+            entity.physicsBody?.applyAngularImpulse(angularImpulse)
+        } else if rotateRight.pushed {
+            entity.physicsBody?.applyAngularImpulse(-angularImpulse)
+        }
+
+        // Update the fuel gauge
+        if burn.pushed {
+            fuelGauge.setFill(percentage: CGFloat(entity.remainingBurnTime / Capsule.secondsOfThrust))
+        }
+
+        // Update the heat shield
+        heatShieldGauge.setFill(percentage: entity.remainingHeatShield / Capsule.heatShieldCapacity)
+        heatGauge.setFill(percentage: entity.heat / Capsule.heatLimit)
     }
 
     public override func didSimulatePhysics() {
@@ -294,6 +357,11 @@ public class GameScene: SKScene {
         // End the game when the entity is stranded in orbit
         if entity.remainingBurnTime <= 0.0 && entity.periapsisHeight > planet.atmosphereHeight {
             endGame(endState: .died(reason: .strandedInOrbit))
+        }
+
+        // End the game when the capsule has been evaporated
+        if entity.heat > Capsule.heatLimit {
+            endGame(endState: .died(reason: .evaporated))
         }
 
         // End the game when the entity has landed
@@ -344,5 +412,8 @@ public class GameScene: SKScene {
             $0.displayState = displayState
         }
         planet.displayState = displayState
+
+        stars.position = displayState.translation.cgPoint
+        stars.zRotation = displayState.rotation
     }
 }

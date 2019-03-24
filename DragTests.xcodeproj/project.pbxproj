@@ -24,6 +24,8 @@
 		302EAD14223BBA13004DBCFC /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 302EAD12223BBA13004DBCFC /* LaunchScreen.storyboard */; };
 		303037272247A046004A964E /* TimeWarpSlider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 303037262247A046004A964E /* TimeWarpSlider.swift */; };
 		303037292247BE1D004A964E /* CGFloat+Random.swift in Sources */ = {isa = PBXBuildFile; fileRef = 303037282247BE1D004A964E /* CGFloat+Random.swift */; };
+		3030372D2247DB73004A964E /* ThrusterParticles.sks in Resources */ = {isa = PBXBuildFile; fileRef = 3030372C2247DB73004A964E /* ThrusterParticles.sks */; };
+		3030372F2247DE6D004A964E /* Gauge.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3030372E2247DE6D004A964E /* Gauge.swift */; };
 		30582E3D22440D3100BE56D3 /* ButtonNode.swift in Sources */ = {isa = PBXBuildFile; fileRef = 30582E3C22440D3100BE56D3 /* ButtonNode.swift */; };
 		30582E402244D38200BE56D3 /* CGPoint+SpatialRelationship.swift in Sources */ = {isa = PBXBuildFile; fileRef = 30582E3F2244D38200BE56D3 /* CGPoint+SpatialRelationship.swift */; };
 		30582E462244E96000BE56D3 /* CGPoint+Rotate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 30582E452244E96000BE56D3 /* CGPoint+Rotate.swift */; };
@@ -60,6 +62,8 @@
 		302EAD15223BBA13004DBCFC /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		303037262247A046004A964E /* TimeWarpSlider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TimeWarpSlider.swift; sourceTree = "<group>"; };
 		303037282247BE1D004A964E /* CGFloat+Random.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "CGFloat+Random.swift"; sourceTree = "<group>"; };
+		3030372C2247DB73004A964E /* ThrusterParticles.sks */ = {isa = PBXFileReference; lastKnownFileType = file.sks; path = ThrusterParticles.sks; sourceTree = "<group>"; };
+		3030372E2247DE6D004A964E /* Gauge.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Gauge.swift; sourceTree = "<group>"; };
 		30582E3C22440D3100BE56D3 /* ButtonNode.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ButtonNode.swift; sourceTree = "<group>"; };
 		30582E3F2244D38200BE56D3 /* CGPoint+SpatialRelationship.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "CGPoint+SpatialRelationship.swift"; sourceTree = "<group>"; };
 		30582E452244E96000BE56D3 /* CGPoint+Rotate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "CGPoint+Rotate.swift"; sourceTree = "<group>"; };
@@ -104,6 +108,7 @@
 				30582E4B2244F67E00BE56D3 /* DeorbitParticles.sks */,
 				301A00DB2246693E007DA092 /* MenuParticles.sks */,
 				301A00E32246D901007DA092 /* Stars.sks */,
+				3030372C2247DB73004A964E /* ThrusterParticles.sks */,
 			);
 			path = Particles;
 			sourceTree = "<group>";
@@ -173,6 +178,7 @@
 				30165207224545F700A7F6D8 /* TargetMarker.swift */,
 				30704C75224793090054C14A /* Slider.swift */,
 				303037262247A046004A964E /* TimeWarpSlider.swift */,
+				3030372E2247DE6D004A964E /* Gauge.swift */,
 			);
 			path = UIComponents;
 			sourceTree = "<group>";
@@ -261,6 +267,7 @@
 				302EAD0F223BBA0E004DBCFC /* Main.storyboard in Resources */,
 				30582E4D2244F67E00BE56D3 /* DeorbitParticles.sks in Resources */,
 				302EAD06223BBA0E004DBCFC /* GameScene.sks in Resources */,
+				3030372D2247DB73004A964E /* ThrusterParticles.sks in Resources */,
 				301A00DD2246693E007DA092 /* MenuParticles.sks in Resources */,
 				302EAD14223BBA13004DBCFC /* LaunchScreen.storyboard in Resources */,
 				301A00E42246D901007DA092 /* Stars.sks in Resources */,
@@ -299,6 +306,7 @@
 				30582E402244D38200BE56D3 /* CGPoint+SpatialRelationship.swift in Sources */,
 				30E94ADE2242E35D005AC4F1 /* CircleIntersection.swift in Sources */,
 				30582E3D22440D3100BE56D3 /* ButtonNode.swift in Sources */,
+				3030372F2247DE6D004A964E /* Gauge.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
