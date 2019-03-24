@@ -16,7 +16,7 @@ enum SimulationState {
 
 typealias DisplayState = (scale: CGFloat, translation: Vector, rotation: CGFloat, viewport: CGRect)
 
-class GameScene: SKScene {
+public class GameScene: SKScene {
 
     var simulationState: SimulationState = .onRails(speed: 1000) {
         didSet {
@@ -60,19 +60,17 @@ class GameScene: SKScene {
     private let progradeBoostButton = ButtonNode(text: "Boost")
     private let retrogradeBoostButton = ButtonNode(text: "Break")
 
+    private var timewarpSlider: TimeWarpSlider!
+
     private var previousCameraScale: CGFloat = 1.0
     private var currentUpdateCycleDT: TimeInterval = 0
     private var lastUpdateTime : TimeInterval = 0
 
-    override func sceneDidLoad() {
+    public override func sceneDidLoad() {
         self.lastUpdateTime = 0
     }
 
-    override func didMove(to view: SKView) {
-        /* Setup your scene here */
-        simulationState = .onRails(speed: 1000)
-
-        // Camera stuff
+    public override func didMove(to view: SKView) {
         let cameraNode = SKCameraNode()
         cameraNode.position = CGPoint(x: 0, y: 0)
         let scalingAction = SKAction.scale(to: Camera.defaultScale, duration: 5)
@@ -82,11 +80,11 @@ class GameScene: SKScene {
         addChild(cameraNode)
         camera = cameraNode
 
-        followSwitch.position = CGPoint(x: 0, y: 250)
+        followSwitch.position = CGPoint(x: 0, y: -220)
         cameraNode.addChild(followSwitch)
 
-        moveSwitch.position = CGPoint(x: -50, y: 200)
-        cameraNode.addChild(moveSwitch)
+//        moveSwitch.position = CGPoint(x: -50, y: 200)
+//        cameraNode.addChild(moveSwitch)
 
         velocityLabel.position = CGPoint(x: 0, y: 290)
         velocityLabel.fontSize = 25
@@ -114,15 +112,11 @@ class GameScene: SKScene {
         periapsisLabel.zPosition = Layer.ui
         cameraNode.addChild(periapsisLabel)
 
-        let timewarpButton = SwitchNode(labelOn: "Off-Rails", labelOff: "On-Rails") { [unowned self] newState in
-            if newState {
-                self.simulationState = .physics(speed: 1)
-            } else {
-                self.simulationState = .onRails(speed: 1000)
-            }
+        timewarpSlider = TimeWarpSlider() { [unowned self] newState in
+            self.simulationState = newState
         }
-        timewarpButton.position = CGPoint(x: 50, y: 200)
-        cameraNode.addChild(timewarpButton)
+        timewarpSlider.position = CGPoint(x: 0, y: 220)
+        cameraNode.addChild(timewarpSlider)
 
         self.physicsWorld.gravity =  CGVector(dx: 0.0, dy: 0.0)
         self.view?.backgroundColor = SKColor.darkGray
@@ -174,7 +168,7 @@ class GameScene: SKScene {
         orbitingEntities.append(p)
     }
 
-    override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
+    public override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
         // Spawn a new dot when you press with one finger
         if touches.count == 1 && moveSwitch.state {
             let scaledTouchPosition = touches.first!.location(in: self)
@@ -182,7 +176,7 @@ class GameScene: SKScene {
         }
     }
     
-    override func touchesMoved(_ touches: Set<UITouch>, with event: UIEvent?) {
+    public override func touchesMoved(_ touches: Set<UITouch>, with event: UIEvent?) {
         guard let touch = touches.first else {
             return
         }
@@ -228,26 +222,22 @@ class GameScene: SKScene {
         }
     }
 
-    override func update(_ currentTime: TimeInterval) {
+    public override func update(_ currentTime: TimeInterval) {
         // Limit the time/physics warp speed
-        // - No rails warp in atmosphere
-        // - Rails warp only at speed=100 below 220km
-        // - Physics warp only at speed=1 below 1km
         if let entity = self.orbitingEntities.first {
             let atmoHeight = Planet.atmosphereHeight
             let entityHeight = entity.heightAboveTerrain
 
-            switch simulationState {
-            case .onRails(let speed):
-                if entityHeight < atmoHeight {
-                    simulationState = .physics(speed: 10)
-                } else if entityHeight < atmoHeight + 120000 && speed > 1 {
-                    simulationState = .onRails(speed: 100)
-                }
-            case .physics(let speed):
-                if entityHeight < 1000 && speed > 1 {
-                    simulationState = .physics(speed: 1)
-                }
+            if entityHeight < 1000 {
+                timewarpSlider.stepLimit = 1
+            } else if entityHeight < atmoHeight {
+                timewarpSlider.stepLimit = 2
+            } else if entityHeight < atmoHeight + 20000 {
+                timewarpSlider.stepLimit = 3
+            } else if entityHeight < atmoHeight + 120000 {
+                timewarpSlider.stepLimit = 4
+            } else {
+                timewarpSlider.stepLimit = 6
             }
         }
 
@@ -264,7 +254,7 @@ class GameScene: SKScene {
         updateOrbitingEntities(deltaTime: dt)
     }
 
-    override func didSimulatePhysics() {
+    public override func didSimulatePhysics() {
         if let entity = orbitingEntities.first, let physicsBody = entity.physicsBody {
             // Update the height label
             heightLabel.text = String(format: "Height: %.2f km", entity.heightAboveTerrain / 1000)
@@ -303,13 +293,12 @@ class GameScene: SKScene {
         propagateDisplayState()
     }
 
-    override func didFinishUpdate() {
+    public override func didFinishUpdate() {
         if let entity = orbitingEntities.first, entity.landed {
             let targetAngle = (planet.targetAngle + CGFloat.pi).truncatingRemainder(dividingBy: 2 * CGFloat.pi)
             let currentAngle = (entity.currentReferenceAngle + CGFloat.pi).truncatingRemainder(dividingBy: 2 * CGFloat.pi)
-            // TODO The deltaAngle can be negative. Fix it
             let deltaAngle = max(targetAngle, currentAngle) - min(targetAngle, currentAngle)
-            let closenessFactor = 1 - deltaAngle / CGFloat.pi // 1 = on-spot, 0 = furthest it gets
+            let closenessFactor = abs(1 - deltaAngle / CGFloat.pi) // 1 = on-spot, 0 = furthest it gets
             let landingSpotScore = Game.landingSpotScore * closenessFactor
 
             let score = Int(round(landingSpotScore)) // TODO Add remaining fuel score

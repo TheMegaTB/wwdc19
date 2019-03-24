@@ -8,34 +8,34 @@
 
 import SpriteKit
 
-enum DeathReason {
+public enum DeathReason {
     case crushedToBits(acceleration: CGFloat)
     case evaporated
     case strandedInOrbit
 }
 
-enum GameEndState {
+public enum GameEndState {
     case landed(score: Int)
     case died(reason: DeathReason)
 }
 
-class GameEndedScene: SKScene {
+public class GameEndedScene: SKScene {
     let gameEndState: GameEndState
     let titleNode = SKLabelNode()
     let subtitleNode = SKLabelNode()
     var newGameButton: ButtonNode!
 
-    init(size: CGSize, gameEndState: GameEndState) {
+    public init(size: CGSize, gameEndState: GameEndState) {
         self.gameEndState = gameEndState
         super.init(size: size)
         self.anchorPoint = CGPoint(x: 0.5, y: 0.5)
     }
 
-    required init?(coder aDecoder: NSCoder) {
+    public required init?(coder aDecoder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
 
-    override func didMove(to view: SKView) {
+    public override func didMove(to view: SKView) {
         titleNode.fontSize = 80
         titleNode.position = CGPoint(x: 0, y: 250)
 

@@ -8,18 +8,18 @@
 
 import SpriteKit
 
-class MenuScene: SKScene {
-    override init(size: CGSize) {
+public class MenuScene: SKScene {
+    public override init(size: CGSize) {
         super.init(size: size)
         self.anchorPoint = CGPoint(x: 0.5, y: 0.5)
         self.physicsWorld.gravity = .zero
     }
 
-    required init?(coder aDecoder: NSCoder) {
+    public required init?(coder aDecoder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
 
-    override func didMove(to view: SKView) {
+    public override func didMove(to view: SKView) {
         let gameTitle = SKLabelNode(text: "REENTRY")
         gameTitle.fontSize = 100
         gameTitle.position = CGPoint(x: 0, y: 250)

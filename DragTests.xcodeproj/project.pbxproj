@@ -22,6 +22,7 @@
 		302EAD0C223BBA0E004DBCFC /* GameViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 302EAD0B223BBA0E004DBCFC /* GameViewController.swift */; };
 		302EAD0F223BBA0E004DBCFC /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 302EAD0D223BBA0E004DBCFC /* Main.storyboard */; };
 		302EAD14223BBA13004DBCFC /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 302EAD12223BBA13004DBCFC /* LaunchScreen.storyboard */; };
+		303037272247A046004A964E /* TimeWarpSlider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 303037262247A046004A964E /* TimeWarpSlider.swift */; };
 		30582E3D22440D3100BE56D3 /* ButtonNode.swift in Sources */ = {isa = PBXBuildFile; fileRef = 30582E3C22440D3100BE56D3 /* ButtonNode.swift */; };
 		30582E402244D38200BE56D3 /* CGPoint+SpatialRelationship.swift in Sources */ = {isa = PBXBuildFile; fileRef = 30582E3F2244D38200BE56D3 /* CGPoint+SpatialRelationship.swift */; };
 		30582E462244E96000BE56D3 /* CGPoint+Rotate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 30582E452244E96000BE56D3 /* CGPoint+Rotate.swift */; };
@@ -33,6 +34,7 @@
 		306720952240498500F825AC /* OrbitMarker.swift in Sources */ = {isa = PBXBuildFile; fileRef = 306720942240498500F825AC /* OrbitMarker.swift */; };
 		3067209722405B7F00F825AC /* PlanetNode.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3067209622405B7F00F825AC /* PlanetNode.swift */; };
 		3067209922406C3100F825AC /* SwitchNode.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3067209822406C3100F825AC /* SwitchNode.swift */; };
+		30704C76224793090054C14A /* Slider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 30704C75224793090054C14A /* Slider.swift */; };
 		30C58EEB223E5CFC00FCF388 /* OrbitalDynamics.swift in Sources */ = {isa = PBXBuildFile; fileRef = 30C58EEA223E5CFC00FCF388 /* OrbitalDynamics.swift */; };
 		30E94ADE2242E35D005AC4F1 /* CircleIntersection.swift in Sources */ = {isa = PBXBuildFile; fileRef = 30E94ADD2242E35D005AC4F1 /* CircleIntersection.swift */; };
 /* End PBXBuildFile section */
@@ -55,6 +57,7 @@
 		302EAD0E223BBA0E004DBCFC /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
 		302EAD13223BBA13004DBCFC /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		302EAD15223BBA13004DBCFC /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		303037262247A046004A964E /* TimeWarpSlider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TimeWarpSlider.swift; sourceTree = "<group>"; };
 		30582E3C22440D3100BE56D3 /* ButtonNode.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ButtonNode.swift; sourceTree = "<group>"; };
 		30582E3F2244D38200BE56D3 /* CGPoint+SpatialRelationship.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "CGPoint+SpatialRelationship.swift"; sourceTree = "<group>"; };
 		30582E452244E96000BE56D3 /* CGPoint+Rotate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "CGPoint+Rotate.swift"; sourceTree = "<group>"; };
@@ -66,6 +69,7 @@
 		306720942240498500F825AC /* OrbitMarker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OrbitMarker.swift; sourceTree = "<group>"; };
 		3067209622405B7F00F825AC /* PlanetNode.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlanetNode.swift; sourceTree = "<group>"; };
 		3067209822406C3100F825AC /* SwitchNode.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SwitchNode.swift; sourceTree = "<group>"; };
+		30704C75224793090054C14A /* Slider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Slider.swift; sourceTree = "<group>"; };
 		30C58EEA223E5CFC00FCF388 /* OrbitalDynamics.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OrbitalDynamics.swift; sourceTree = "<group>"; };
 		30E94ADC2242D3CB005AC4F1 /* Circle.playground */ = {isa = PBXFileReference; lastKnownFileType = file.playground; path = Circle.playground; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.swift; };
 		30E94ADD2242E35D005AC4F1 /* CircleIntersection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CircleIntersection.swift; sourceTree = "<group>"; };
@@ -164,6 +168,8 @@
 				3067209822406C3100F825AC /* SwitchNode.swift */,
 				30582E3C22440D3100BE56D3 /* ButtonNode.swift */,
 				30165207224545F700A7F6D8 /* TargetMarker.swift */,
+				30704C75224793090054C14A /* Slider.swift */,
+				303037262247A046004A964E /* TimeWarpSlider.swift */,
 			);
 			path = UIComponents;
 			sourceTree = "<group>";
@@ -278,9 +284,11 @@
 				30582E462244E96000BE56D3 /* CGPoint+Rotate.swift in Sources */,
 				301A00E022466F16007DA092 /* CapsuleNode.swift in Sources */,
 				30165208224545F700A7F6D8 /* TargetMarker.swift in Sources */,
+				303037272247A046004A964E /* TimeWarpSlider.swift in Sources */,
 				3067209722405B7F00F825AC /* PlanetNode.swift in Sources */,
 				30582E482244ECD800BE56D3 /* Constants.swift in Sources */,
 				302EAD04223BBA0E004DBCFC /* AppDelegate.swift in Sources */,
+				30704C76224793090054C14A /* Slider.swift in Sources */,
 				30672093223F13E600F825AC /* OrbitingNode.swift in Sources */,
 				30582E4A2244EEB400BE56D3 /* Vector.swift in Sources */,
 				30582E502245194B00BE56D3 /* CoreGraphics+Circle.swift in Sources */,
