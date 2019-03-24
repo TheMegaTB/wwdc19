@@ -8,9 +8,18 @@
 
 import SpriteKit
 
-class OrbitingNode: CapsuleNode { // SKShapeNode {
+enum ThrusterState {
+    case prograde
+    case retrograde
+    case disabled
+}
+
+class OrbitingNode: CapsuleNode {
 
     var highestAcceleration: CGFloat = 0.0
+    var remainingBurnTime: TimeInterval = Capsule.secondsOfThrust
+
+    var thrusterState: ThrusterState = .disabled
 
     var onRails: Bool = true {
         didSet {
@@ -103,6 +112,8 @@ class OrbitingNode: CapsuleNode { // SKShapeNode {
     }
 
     func update(deltaTime: TimeInterval) throws {
+        guard let physicsBody = self.physicsBody else { return }
+
         let dT = deltaTime * Double(speed)
         localTime += dT
 
@@ -111,7 +122,7 @@ class OrbitingNode: CapsuleNode { // SKShapeNode {
             let referencePosition = Vector(reference.position)
 
             self.position = (position + referencePosition).cgPoint
-            self.physicsBody?.velocity = speed.cgVector
+            physicsBody.velocity = speed.cgVector
         } else {
             // Update the orbital parameters in order for the orbitalLine to get updated
             if !(orbitalParameters?.isHyperbolic ?? false) {
@@ -120,13 +131,14 @@ class OrbitingNode: CapsuleNode { // SKShapeNode {
 
             // Calculate and apply the gravitational force
             let G: CGFloat = gravitationalConstant
-            guard let m1 = physicsBody?.mass, let m2 = reference.physicsBody?.mass else { return }
+            let m1 = physicsBody.mass
+            guard let m2 = reference.physicsBody?.mass else { return }
             let pVec = Vector(position) - Vector(reference.position)
             let npVecNorm = pVec.normalized()
             let r = pVec.length
             let F = (G * m1 * m2) / pow(r, 2)
             let FVec = npVecNorm * -F
-            self.physicsBody?.applyForce(FVec.cgVector)
+            physicsBody.applyForce(FVec.cgVector)
 
             // Calculate and apply the drag force
             let altitude = heightAboveTerrain
@@ -139,12 +151,12 @@ class OrbitingNode: CapsuleNode { // SKShapeNode {
 
             let referenceArea: CGFloat = 12.0 // m^2
             let dragCoefficient: CGFloat = 1.05
-            let velocity = Vector(physicsBody!.velocity)
+            let velocity = Vector(physicsBody.velocity)
             let dragForce = dragCoefficient / 2 * airDensity * pow(velocity.length, 2) * referenceArea
             let dragForceVector = dragForce * -velocity.normalized()
-            self.physicsBody?.applyForce(dragForceVector.cgVector)
+            physicsBody.applyForce(dragForceVector.cgVector)
 
-            let dragAcceleration = dragForce / self.physicsBody!.mass
+            let dragAcceleration = dragForce / physicsBody.mass
             if dragAcceleration > highestAcceleration {
                 highestAcceleration = dragAcceleration
             }
@@ -155,6 +167,24 @@ class OrbitingNode: CapsuleNode { // SKShapeNode {
             deorbitParticles.position = (velocity.normalized() * 100).cgPoint
             deorbitParticles.particleBirthRate = burnRate * 100
             deorbitParticles.alpha = min(1, burnRate * 0.5 - 150)
+
+            // Disable the thruster when there is no burn time remaining
+            if remainingBurnTime <= 0.0 {
+                thrusterState = .disabled
+            }
+
+            // Apply thruster force
+            let force = Vector(physicsBody.velocity).normalized() * Capsule.thrust
+            switch thrusterState {
+            case .prograde:
+                physicsBody.applyForce(force.cgVector)
+                remainingBurnTime -= dT
+            case .retrograde:
+                physicsBody.applyForce((-force).cgVector)
+                remainingBurnTime -= dT
+            case .disabled:
+                break
+            }
         }
 
         redrawPosition()

@@ -9,24 +9,22 @@
 import SpriteKit
 
 class SwitchNode: SKSpriteNode {
-    let labels: (on: String, off: String)
     let label: SKLabelNode
     let callback: ((Bool) -> ())?
 
     var state = false {
         didSet {
-            label.text = state ? labels.on : labels.off
+            color = state ? SKColor.red : SKColor.lightGray
             self.callback?(state)
         }
     }
 
-    init(labelOn: String, labelOff: String, _ callback: ((Bool) -> ())? = nil) {
+    init(text: String, _ callback: ((Bool) -> ())? = nil) {
         self.callback = callback
 
         let size = CGSize(width: 100, height: 32)
 
-        labels = (on: labelOn, off: labelOff)
-        label = SKLabelNode(text: labelOff)
+        label = SKLabelNode(text: text)
         label.fontSize = 16
         label.zPosition = Layer.ui
         label.position = CGPoint(x: 0, y: label.fontSize / 2 - size.height / 2)

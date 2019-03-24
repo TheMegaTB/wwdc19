@@ -36,22 +36,9 @@ public class GameScene: SKScene {
         }
     }
 
-    func updateSimulationState(of entity: OrbitingNode) {
-        switch simulationState {
-        case .onRails(let speed):
-            // Put entities on rails
-            entity.onRails = true
-            entity.speed = speed
-        case .physics(let speed):
-            // Take entities off rails
-            entity.onRails = false
-            entity.speed = speed
-        }
-    }
-
-    private lazy var planet = PlanetNode.default(withDisplayState: displayState, andTargetAngle: 4.1)
-    private let moveSwitch = SwitchNode(labelOn: "Create Mode", labelOff: "Move Mode")
-    private let followSwitch = SwitchNode(labelOn: "Follow", labelOff: "Freecam")
+    private lazy var planet = PlanetNode.default(withDisplayState: displayState, andTargetAngle: CGFloat.random(in: 0.0...CGFloat.pi*2))
+//    private let moveSwitch = SwitchNode(labelOn: "Create Mode", labelOff: "Move Mode")
+    private let followSwitch = SwitchNode(text: "Follow-cam")
     private let velocityLabel = SKLabelNode(text: nil)
     private let heightLabel = SKLabelNode(text: nil)
     private let apoapsisLabel = SKLabelNode(text: nil)
@@ -97,9 +84,15 @@ public class GameScene: SKScene {
         cameraNode.addChild(heightLabel)
 
         retrogradeBoostButton.position = CGPoint(x: -50, y: -250)
+        retrogradeBoostButton.callback = { [unowned self] enabled in
+            self.orbitingEntities.first?.thrusterState = enabled ? .retrograde : .disabled
+        }
         cameraNode.addChild(retrogradeBoostButton)
 
         progradeBoostButton.position = CGPoint(x: 50, y: -250)
+        progradeBoostButton.callback = { [unowned self] enabled in
+            self.orbitingEntities.first?.thrusterState = enabled ? .prograde : .disabled
+        }
         cameraNode.addChild(progradeBoostButton)
 
         apoapsisLabel.position = CGPoint(x: 0, y: -300)
@@ -128,12 +121,11 @@ public class GameScene: SKScene {
         pinchGesture.addTarget(self, action: #selector(pinchGestureAction(_:)))
         view.addGestureRecognizer(pinchGesture)
 
-        // Testing
         createEntity(at: CGPoint(x: planet.bodyRadius + 411000, y: 0))
     }
 
 
-    @objc func pinchGestureAction(_ sender: UIPinchGestureRecognizer) {
+    @objc private func pinchGestureAction(_ sender: UIPinchGestureRecognizer) {
         guard let camera = self.camera else {
             return
         }
@@ -151,7 +143,7 @@ public class GameScene: SKScene {
         propagateDisplayState()
     }
 
-    var orbitingEntities: [OrbitingNode] = []
+    private var orbitingEntities: [OrbitingNode] = []
 
     func createEntity(at position: CGPoint) {
         let p = OrbitingNode(reference: planet, displayState: displayState)
@@ -168,20 +160,33 @@ public class GameScene: SKScene {
         orbitingEntities.append(p)
     }
 
-    public override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
-        // Spawn a new dot when you press with one finger
-        if touches.count == 1 && moveSwitch.state {
-            let scaledTouchPosition = touches.first!.location(in: self)
-            createEntity(at: scaledTouchPosition)
+    private func updateSimulationState(of entity: OrbitingNode) {
+        switch simulationState {
+        case .onRails(let speed):
+            // Put entities on rails
+            entity.onRails = true
+            entity.speed = speed
+        case .physics(let speed):
+            // Take entities off rails
+            entity.onRails = false
+            entity.speed = speed
         }
     }
-    
+
+//    public override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
+//        // Spawn a new dot when you press with one finger
+//        if touches.count == 1 && moveSwitch.state {
+//            let scaledTouchPosition = touches.first!.location(in: self)
+//            createEntity(at: scaledTouchPosition)
+//        }
+//    }
+
     public override func touchesMoved(_ touches: Set<UITouch>, with event: UIEvent?) {
         guard let touch = touches.first else {
             return
         }
 
-        if !moveSwitch.state && !followSwitch.state {
+        if !followSwitch.state { // && !moveSwitch.state
             let location = touch.location(in: self)
             let previousLocation = touch.previousLocation(in: self)
 
@@ -192,7 +197,7 @@ public class GameScene: SKScene {
         }
     }
 
-    func updateOrbitingEntities(deltaTime dt: TimeInterval) {
+    private func updateOrbitingEntities(deltaTime dt: TimeInterval) {
         // Updating gravity affected objects
         orbitingEntities = orbitingEntities.compactMap {
             do {
@@ -210,16 +215,6 @@ public class GameScene: SKScene {
             $0.removeFromParent()
             return nil
         }
-
-        // Add boost to orbiting entity 0
-        if let physicsEntity = orbitingEntities.first?.physicsBody {
-            let force = Vector(physicsEntity.velocity).normalized() * Capsule.thrust
-            if progradeBoostButton.pushed {
-                physicsEntity.applyForce(force.cgVector)
-            } else if retrogradeBoostButton.pushed {
-                physicsEntity.applyForce((-force).cgVector)
-            }
-        }
     }
 
     public override func update(_ currentTime: TimeInterval) {
@@ -232,7 +227,7 @@ public class GameScene: SKScene {
                 timewarpSlider.stepLimit = 1
             } else if entityHeight < atmoHeight {
                 timewarpSlider.stepLimit = 2
-            } else if entityHeight < atmoHeight + 20000 {
+            } else if entityHeight < atmoHeight + 1000 {
                 timewarpSlider.stepLimit = 3
             } else if entityHeight < atmoHeight + 120000 {
                 timewarpSlider.stepLimit = 4
@@ -294,27 +289,42 @@ public class GameScene: SKScene {
     }
 
     public override func didFinishUpdate() {
-        if let entity = orbitingEntities.first, entity.landed {
+        guard let entity = orbitingEntities.first else { return }
+
+        // End the game when the entity is stranded in orbit
+        if entity.remainingBurnTime <= 0.0 && entity.periapsisHeight > planet.atmosphereHeight {
+            endGame(endState: .died(reason: .strandedInOrbit))
+        }
+
+        // End the game when the entity has landed
+        if entity.landed {
             let targetAngle = (planet.targetAngle + CGFloat.pi).truncatingRemainder(dividingBy: 2 * CGFloat.pi)
             let currentAngle = (entity.currentReferenceAngle + CGFloat.pi).truncatingRemainder(dividingBy: 2 * CGFloat.pi)
             let deltaAngle = max(targetAngle, currentAngle) - min(targetAngle, currentAngle)
             let closenessFactor = abs(1 - deltaAngle / CGFloat.pi) // 1 = on-spot, 0 = furthest it gets
             let landingSpotScore = Game.landingSpotScore * closenessFactor
 
-            let score = Int(round(landingSpotScore)) // TODO Add remaining fuel score
+            let remainingFuelPercentage = CGFloat(entity.remainingBurnTime / Capsule.secondsOfThrust)
+            let remainingFuelScore = Game.remainingFuelScore * remainingFuelPercentage
+
+            let score = Int(round(landingSpotScore + remainingFuelScore)) // TODO Add remaining fuel score
             var gameEndState: GameEndState = .landed(score: score)
 
             if entity.highestAcceleration > Game.maximumAcceleration {
                 gameEndState = .died(reason: DeathReason.crushedToBits(acceleration: entity.highestAcceleration))
             }
 
-            let gameEndedScene = GameEndedScene(size: self.size, gameEndState: gameEndState)
-            gameEndedScene.scaleMode = .aspectFill
-            self.scene!.view!.presentScene(gameEndedScene, transition: SKTransition.crossFade(withDuration: 1))
+            endGame(endState: gameEndState)
         }
     }
 
-    var displayState: DisplayState {
+    private func endGame(endState: GameEndState) {
+        let gameEndedScene = GameEndedScene(size: self.size, gameEndState: endState)
+        gameEndedScene.scaleMode = .aspectFill
+        self.scene!.view!.presentScene(gameEndedScene, transition: SKTransition.crossFade(withDuration: 1))
+    }
+
+    private var displayState: DisplayState {
         guard let camera = camera else { return (scale: 1, translation: [0, 0], rotation: 0, viewport: frame) }
 
         let scale = 1 / camera.xScale
@@ -329,7 +339,7 @@ public class GameScene: SKScene {
         return (scale: scale, translation: translation, rotation: -camera.zRotation, viewport: viewport)
     }
 
-    func propagateDisplayState() {
+    private func propagateDisplayState() {
         orbitingEntities.forEach {
             $0.displayState = displayState
         }

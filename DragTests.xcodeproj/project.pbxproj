@@ -23,6 +23,7 @@
 		302EAD0F223BBA0E004DBCFC /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 302EAD0D223BBA0E004DBCFC /* Main.storyboard */; };
 		302EAD14223BBA13004DBCFC /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 302EAD12223BBA13004DBCFC /* LaunchScreen.storyboard */; };
 		303037272247A046004A964E /* TimeWarpSlider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 303037262247A046004A964E /* TimeWarpSlider.swift */; };
+		303037292247BE1D004A964E /* CGFloat+Random.swift in Sources */ = {isa = PBXBuildFile; fileRef = 303037282247BE1D004A964E /* CGFloat+Random.swift */; };
 		30582E3D22440D3100BE56D3 /* ButtonNode.swift in Sources */ = {isa = PBXBuildFile; fileRef = 30582E3C22440D3100BE56D3 /* ButtonNode.swift */; };
 		30582E402244D38200BE56D3 /* CGPoint+SpatialRelationship.swift in Sources */ = {isa = PBXBuildFile; fileRef = 30582E3F2244D38200BE56D3 /* CGPoint+SpatialRelationship.swift */; };
 		30582E462244E96000BE56D3 /* CGPoint+Rotate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 30582E452244E96000BE56D3 /* CGPoint+Rotate.swift */; };
@@ -58,6 +59,7 @@
 		302EAD13223BBA13004DBCFC /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		302EAD15223BBA13004DBCFC /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		303037262247A046004A964E /* TimeWarpSlider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TimeWarpSlider.swift; sourceTree = "<group>"; };
+		303037282247BE1D004A964E /* CGFloat+Random.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "CGFloat+Random.swift"; sourceTree = "<group>"; };
 		30582E3C22440D3100BE56D3 /* ButtonNode.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ButtonNode.swift; sourceTree = "<group>"; };
 		30582E3F2244D38200BE56D3 /* CGPoint+SpatialRelationship.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "CGPoint+SpatialRelationship.swift"; sourceTree = "<group>"; };
 		30582E452244E96000BE56D3 /* CGPoint+Rotate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "CGPoint+Rotate.swift"; sourceTree = "<group>"; };
@@ -147,6 +149,7 @@
 				30582E452244E96000BE56D3 /* CGPoint+Rotate.swift */,
 				30582E4F2245194B00BE56D3 /* CoreGraphics+Circle.swift */,
 				301A00E12246A269007DA092 /* SKAction+Shake.swift */,
+				303037282247BE1D004A964E /* CGFloat+Random.swift */,
 			);
 			path = Extensions;
 			sourceTree = "<group>";
@@ -282,6 +285,7 @@
 				301A00D722458386007DA092 /* GameEndedScene.swift in Sources */,
 				302EAD0C223BBA0E004DBCFC /* GameViewController.swift in Sources */,
 				30582E462244E96000BE56D3 /* CGPoint+Rotate.swift in Sources */,
+				303037292247BE1D004A964E /* CGFloat+Random.swift in Sources */,
 				301A00E022466F16007DA092 /* CapsuleNode.swift in Sources */,
 				30165208224545F700A7F6D8 /* TargetMarker.swift in Sources */,
 				303037272247A046004A964E /* TimeWarpSlider.swift in Sources */,

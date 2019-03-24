@@ -45,6 +45,17 @@ public class GameEndedScene: SKScene {
         addChild(titleNode)
         addChild(subtitleNode)
 
+        newGameButton = ButtonNode(text: "Restart") { _ in
+            let targetScene = GameScene(size: self.size)
+            targetScene.scaleMode = .aspectFill
+            let transition = SKTransition.fade(withDuration: 2)
+            transition.pausesOutgoingScene = false
+            transition.pausesIncomingScene = false
+            self.scene!.view!.presentScene(targetScene, transition: transition)
+        }
+        newGameButton.position = CGPoint(x: 0, y: 50)
+        addChild(newGameButton)
+
         switch gameEndState {
         case .landed(let score):
             touchdownConfirmed(score)
@@ -59,17 +70,6 @@ public class GameEndedScene: SKScene {
                 crushedToBits(acceleration)
             }
         }
-
-        newGameButton = ButtonNode(text: "Restart") { _ in
-            let targetScene = GameScene(size: self.size)
-            targetScene.scaleMode = .aspectFill
-            let transition = SKTransition.fade(withDuration: 2)
-            transition.pausesOutgoingScene = false
-            transition.pausesIncomingScene = false
-            self.scene!.view!.presentScene(targetScene, transition: transition)
-        }
-        newGameButton.position = CGPoint(x: 0, y: 50)
-        addChild(newGameButton)
     }
 
     var viewport: CGRect {

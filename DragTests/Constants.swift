@@ -23,6 +23,7 @@ struct Capsule {
     static let size = CGSize(width: 3.7, height: 6.1)
     static let mass: CGFloat = 6400     // [kg]
     static let thrust: CGFloat = 934000 // [N]
+    static let secondsOfThrust: TimeInterval = 10
 }
 
 struct Simulation {
@@ -46,6 +47,7 @@ struct Emitter {
 struct Game {
     static let settlingVelocityThreshold: CGFloat = 5 // Speed at which the capsule is considered landed [m/s]
     static let landingSpotScore: CGFloat = 10000 // Value added to score if you land spot-on
+    static let remainingFuelScore: CGFloat = 2000 // Value added to score if your fuel is full
     static let maximumAcceleration: CGFloat = 150 // Maximum tolerated acceleration [m/s^2]
 }
 

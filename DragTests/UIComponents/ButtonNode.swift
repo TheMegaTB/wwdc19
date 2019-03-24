@@ -10,7 +10,7 @@ import SpriteKit
 
 class ButtonNode: SKSpriteNode {
     let label: SKLabelNode
-    let callback: ((Bool) -> ())?
+    var callback: ((Bool) -> ())?
 
     private(set) var pushed: Bool = false {
         didSet {
