@@ -79,6 +79,7 @@
 		30E94ADC2242D3CB005AC4F1 /* Circle.playground */ = {isa = PBXFileReference; lastKnownFileType = file.playground; path = Circle.playground; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.swift; };
 		30E94ADD2242E35D005AC4F1 /* CircleIntersection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CircleIntersection.swift; sourceTree = "<group>"; };
 		30F507602248CAB6004355F9 /* Stars.sks */ = {isa = PBXFileReference; lastKnownFileType = file.sks; path = Stars.sks; sourceTree = "<group>"; };
+		30F507622248CB35004355F9 /* Reentry.playground */ = {isa = PBXFileReference; lastKnownFileType = file.playground; path = Reentry.playground; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.swift; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -117,6 +118,7 @@
 			isa = PBXGroup;
 			children = (
 				30E94ADC2242D3CB005AC4F1 /* Circle.playground */,
+				30F507622248CB35004355F9 /* Reentry.playground */,
 				302EAD02223BBA0E004DBCFC /* Reentry */,
 				302EAD01223BBA0E004DBCFC /* Products */,
 			);
