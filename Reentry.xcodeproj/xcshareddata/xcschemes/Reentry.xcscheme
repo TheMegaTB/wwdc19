@@ -15,9 +15,9 @@
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "302EACFF223BBA0E004DBCFC"
-               BuildableName = "DragTests.app"
-               BlueprintName = "DragTests"
-               ReferencedContainer = "container:DragTests.xcodeproj">
+               BuildableName = "Reentry.app"
+               BlueprintName = "Reentry"
+               ReferencedContainer = "container:Reentry.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
       </BuildActionEntries>
@@ -33,9 +33,9 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "302EACFF223BBA0E004DBCFC"
-            BuildableName = "DragTests.app"
-            BlueprintName = "DragTests"
-            ReferencedContainer = "container:DragTests.xcodeproj">
+            BuildableName = "Reentry.app"
+            BlueprintName = "Reentry"
+            ReferencedContainer = "container:Reentry.xcodeproj">
          </BuildableReference>
       </MacroExpansion>
       <AdditionalOptions>
@@ -56,9 +56,9 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "302EACFF223BBA0E004DBCFC"
-            BuildableName = "DragTests.app"
-            BlueprintName = "DragTests"
-            ReferencedContainer = "container:DragTests.xcodeproj">
+            BuildableName = "Reentry.app"
+            BlueprintName = "Reentry"
+            ReferencedContainer = "container:Reentry.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
       <EnvironmentVariables>
@@ -82,9 +82,9 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "302EACFF223BBA0E004DBCFC"
-            BuildableName = "DragTests.app"
-            BlueprintName = "DragTests"
-            ReferencedContainer = "container:DragTests.xcodeproj">
+            BuildableName = "Reentry.app"
+            BlueprintName = "Reentry"
+            ReferencedContainer = "container:Reentry.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
    </ProfileAction>

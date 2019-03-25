@@ -14,7 +14,6 @@
 		301A00DE2246693E007DA092 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 301A00DC2246693E007DA092 /* Assets.xcassets */; };
 		301A00E022466F16007DA092 /* CapsuleNode.swift in Sources */ = {isa = PBXBuildFile; fileRef = 301A00DF22466F16007DA092 /* CapsuleNode.swift */; };
 		301A00E22246A269007DA092 /* SKAction+Shake.swift in Sources */ = {isa = PBXBuildFile; fileRef = 301A00E12246A269007DA092 /* SKAction+Shake.swift */; };
-		301A00E42246D901007DA092 /* Stars.sks in Resources */ = {isa = PBXBuildFile; fileRef = 301A00E32246D901007DA092 /* Stars.sks */; };
 		302EAD04223BBA0E004DBCFC /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 302EAD03223BBA0E004DBCFC /* AppDelegate.swift */; };
 		302EAD06223BBA0E004DBCFC /* GameScene.sks in Resources */ = {isa = PBXBuildFile; fileRef = 302EAD05223BBA0E004DBCFC /* GameScene.sks */; };
 		302EAD08223BBA0E004DBCFC /* Actions.sks in Resources */ = {isa = PBXBuildFile; fileRef = 302EAD07223BBA0E004DBCFC /* Actions.sks */; };
@@ -40,6 +39,7 @@
 		30704C76224793090054C14A /* Slider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 30704C75224793090054C14A /* Slider.swift */; };
 		30C58EEB223E5CFC00FCF388 /* OrbitalDynamics.swift in Sources */ = {isa = PBXBuildFile; fileRef = 30C58EEA223E5CFC00FCF388 /* OrbitalDynamics.swift */; };
 		30E94ADE2242E35D005AC4F1 /* CircleIntersection.swift in Sources */ = {isa = PBXBuildFile; fileRef = 30E94ADD2242E35D005AC4F1 /* CircleIntersection.swift */; };
+		30F507612248CAB6004355F9 /* Stars.sks in Resources */ = {isa = PBXBuildFile; fileRef = 30F507602248CAB6004355F9 /* Stars.sks */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -50,8 +50,7 @@
 		301A00DC2246693E007DA092 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; name = Assets.xcassets; path = ../Particles/Assets.xcassets; sourceTree = "<group>"; };
 		301A00DF22466F16007DA092 /* CapsuleNode.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CapsuleNode.swift; sourceTree = "<group>"; };
 		301A00E12246A269007DA092 /* SKAction+Shake.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "SKAction+Shake.swift"; sourceTree = "<group>"; };
-		301A00E32246D901007DA092 /* Stars.sks */ = {isa = PBXFileReference; lastKnownFileType = file.sks; name = Stars.sks; path = DragTests/Particles/Stars.sks; sourceTree = SOURCE_ROOT; };
-		302EAD00223BBA0E004DBCFC /* DragTests.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = DragTests.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		302EAD00223BBA0E004DBCFC /* Reentry.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Reentry.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		302EAD03223BBA0E004DBCFC /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		302EAD05223BBA0E004DBCFC /* GameScene.sks */ = {isa = PBXFileReference; lastKnownFileType = file.sks; path = GameScene.sks; sourceTree = "<group>"; };
 		302EAD07223BBA0E004DBCFC /* Actions.sks */ = {isa = PBXFileReference; lastKnownFileType = file.sks; path = Actions.sks; sourceTree = "<group>"; };
@@ -79,6 +78,7 @@
 		30C58EEA223E5CFC00FCF388 /* OrbitalDynamics.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OrbitalDynamics.swift; sourceTree = "<group>"; };
 		30E94ADC2242D3CB005AC4F1 /* Circle.playground */ = {isa = PBXFileReference; lastKnownFileType = file.playground; path = Circle.playground; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.swift; };
 		30E94ADD2242E35D005AC4F1 /* CircleIntersection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CircleIntersection.swift; sourceTree = "<group>"; };
+		30F507602248CAB6004355F9 /* Stars.sks */ = {isa = PBXFileReference; lastKnownFileType = file.sks; path = Stars.sks; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -107,8 +107,8 @@
 			children = (
 				30582E4B2244F67E00BE56D3 /* DeorbitParticles.sks */,
 				301A00DB2246693E007DA092 /* MenuParticles.sks */,
-				301A00E32246D901007DA092 /* Stars.sks */,
 				3030372C2247DB73004A964E /* ThrusterParticles.sks */,
+				30F507602248CAB6004355F9 /* Stars.sks */,
 			);
 			path = Particles;
 			sourceTree = "<group>";
@@ -117,7 +117,7 @@
 			isa = PBXGroup;
 			children = (
 				30E94ADC2242D3CB005AC4F1 /* Circle.playground */,
-				302EAD02223BBA0E004DBCFC /* DragTests */,
+				302EAD02223BBA0E004DBCFC /* Reentry */,
 				302EAD01223BBA0E004DBCFC /* Products */,
 			);
 			sourceTree = "<group>";
@@ -125,26 +125,26 @@
 		302EAD01223BBA0E004DBCFC /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				302EAD00223BBA0E004DBCFC /* DragTests.app */,
+				302EAD00223BBA0E004DBCFC /* Reentry.app */,
 			);
 			name = Products;
 			sourceTree = "<group>";
 		};
-		302EAD02223BBA0E004DBCFC /* DragTests */ = {
+		302EAD02223BBA0E004DBCFC /* Reentry */ = {
 			isa = PBXGroup;
 			children = (
-				30582E442244DAB200BE56D3 /* Support Files */,
 				302EAD03223BBA0E004DBCFC /* AppDelegate.swift */,
 				302EAD0B223BBA0E004DBCFC /* GameViewController.swift */,
 				30582E472244ECD800BE56D3 /* Constants.swift */,
-				301A00DA22466630007DA092 /* Particles */,
 				301A00D522458372007DA092 /* Scenes */,
-				30582E432244DA6B00BE56D3 /* Maths */,
 				30582E422244DA5300BE56D3 /* UIComponents */,
 				30582E412244DA3000BE56D3 /* OrbitingEntities */,
+				301A00DA22466630007DA092 /* Particles */,
+				30582E432244DA6B00BE56D3 /* Maths */,
 				30582E3E2244D36100BE56D3 /* Extensions */,
+				30582E442244DAB200BE56D3 /* Support Files */,
 			);
-			path = DragTests;
+			path = Reentry;
 			sourceTree = "<group>";
 		};
 		30582E3E2244D36100BE56D3 /* Extensions */ = {
@@ -209,9 +209,9 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
-		302EACFF223BBA0E004DBCFC /* DragTests */ = {
+		302EACFF223BBA0E004DBCFC /* Reentry */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 302EAD18223BBA13004DBCFC /* Build configuration list for PBXNativeTarget "DragTests" */;
+			buildConfigurationList = 302EAD18223BBA13004DBCFC /* Build configuration list for PBXNativeTarget "Reentry" */;
 			buildPhases = (
 				302EACFC223BBA0E004DBCFC /* Sources */,
 				302EACFD223BBA0E004DBCFC /* Frameworks */,
@@ -221,9 +221,9 @@
 			);
 			dependencies = (
 			);
-			name = DragTests;
+			name = Reentry;
 			productName = DragTests;
-			productReference = 302EAD00223BBA0E004DBCFC /* DragTests.app */;
+			productReference = 302EAD00223BBA0E004DBCFC /* Reentry.app */;
 			productType = "com.apple.product-type.application";
 		};
 /* End PBXNativeTarget section */
@@ -241,7 +241,7 @@
 					};
 				};
 			};
-			buildConfigurationList = 302EACFB223BBA0E004DBCFC /* Build configuration list for PBXProject "DragTests" */;
+			buildConfigurationList = 302EACFB223BBA0E004DBCFC /* Build configuration list for PBXProject "Reentry" */;
 			compatibilityVersion = "Xcode 9.3";
 			developmentRegion = en;
 			hasScannedForEncodings = 0;
@@ -254,7 +254,7 @@
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				302EACFF223BBA0E004DBCFC /* DragTests */,
+				302EACFF223BBA0E004DBCFC /* Reentry */,
 			);
 		};
 /* End PBXProject section */
@@ -270,9 +270,9 @@
 				3030372D2247DB73004A964E /* ThrusterParticles.sks in Resources */,
 				301A00DD2246693E007DA092 /* MenuParticles.sks in Resources */,
 				302EAD14223BBA13004DBCFC /* LaunchScreen.storyboard in Resources */,
-				301A00E42246D901007DA092 /* Stars.sks in Resources */,
 				301A00DE2246693E007DA092 /* Assets.xcassets in Resources */,
 				302EAD08223BBA0E004DBCFC /* Actions.sks in Resources */,
+				30F507612248CAB6004355F9 /* Stars.sks in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -454,12 +454,12 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = LQWS3ZT7UK;
-				INFOPLIST_FILE = "$(SRCROOT)/DragTests/Support Files/Info.plist";
+				INFOPLIST_FILE = "$(SRCROOT)/Reentry/Support Files/Info.plist";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = de.blechschmidt.DragTests;
+				PRODUCT_BUNDLE_IDENTIFIER = de.blechschmidt.Reentry;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_VERSION = 4.2;
 				TARGETED_DEVICE_FAMILY = "1,2";
@@ -472,12 +472,12 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = LQWS3ZT7UK;
-				INFOPLIST_FILE = "$(SRCROOT)/DragTests/Support Files/Info.plist";
+				INFOPLIST_FILE = "$(SRCROOT)/Reentry/Support Files/Info.plist";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = de.blechschmidt.DragTests;
+				PRODUCT_BUNDLE_IDENTIFIER = de.blechschmidt.Reentry;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_VERSION = 4.2;
 				TARGETED_DEVICE_FAMILY = "1,2";
@@ -487,7 +487,7 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		302EACFB223BBA0E004DBCFC /* Build configuration list for PBXProject "DragTests" */ = {
+		302EACFB223BBA0E004DBCFC /* Build configuration list for PBXProject "Reentry" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				302EAD16223BBA13004DBCFC /* Debug */,
@@ -496,7 +496,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		302EAD18223BBA13004DBCFC /* Build configuration list for PBXNativeTarget "DragTests" */ = {
+		302EAD18223BBA13004DBCFC /* Build configuration list for PBXNativeTarget "Reentry" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				302EAD19223BBA13004DBCFC /* Debug */,

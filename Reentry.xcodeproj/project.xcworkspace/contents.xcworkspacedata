@@ -2,6 +2,6 @@
 <Workspace
    version = "1.0">
    <FileRef
-      location = "self:DragTests.xcodeproj">
+      location = "self:/Users/themegatb/Projects/Apple/macOS/WWDCScholarship/DragTests/Reentry.xcodeproj">
    </FileRef>
 </Workspace>

@@ -284,6 +284,6 @@ class OrbitingNode: CapsuleNode {
 
     func redrawPosition() {
         positionMarker.position = (Vector(position) * displayState.scale + displayState.translation).cgPoint.rotated(by: displayState.rotation)
-        positionMarker.zRotation = zRotation
+        positionMarker.zRotation = zRotation + displayState.rotation
     }
 }
